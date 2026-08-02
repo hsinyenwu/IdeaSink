@@ -18,7 +18,18 @@ optionally sync between two people through GitHub.
 3. Click the named label to open its page and start writing.
 4. Use the toolbar to format; everything saves automatically.
 
-The little version tag lives at the bottom of the **Menu** (currently **v32**).
+The little version tag lives at the bottom of the **Menu** (currently **v33**).
+
+## Multiple notebooks (name follows the file)
+
+You can keep more than one separate IdeaSink — for example a **shared** one and a **private** local one. Each is simply a copy of `IdeaSink.html` with a **different file name**, and the name shown in the browser tab and the top‑left header **follows the file name**:
+
+- `IdeaSink.html` → shows “IdeaSink” (this is the original/default notebook — keep your shared, GitHub‑synced one as this).
+- `Private.html` → shows “Private”, `Work Ideas.html` → shows “Work Ideas”, and so on.
+
+Each differently‑named file is a **completely separate notebook**: its own labels and pages, its own local storage, and its own Live‑sync settings. So you can have `IdeaSink.html` synced with your wife via GitHub, and `Private.html` sitting purely on your computer with sync off — they never mix, and their tabs are easy to tell apart.
+
+A couple of notes: the name comes from the file name, so **keep a notebook’s file name stable** (renaming it starts a fresh, empty notebook under the new name — your old one is still there under the old name). If you’d rather set the name in the address bar, you can also open `IdeaSink.html?ws=AnyName`.
 
 ---
 
@@ -163,4 +174,4 @@ org. (Ask if you want those steps.)
 - Use the **same browser** on a given computer, or your notes will look missing (each browser keeps its own copy). Sync or a restored backup brings them together.
 - Keep only one copy of `IdeaSink.html` in your folder to avoid opening an old version by mistake; the Menu shows the version number so you can confirm.
 
-*IdeaSink v32*
+*IdeaSink v33*

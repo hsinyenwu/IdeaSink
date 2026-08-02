@@ -358,7 +358,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
   <header class="deskbar">
     <div class="brand">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h7.09a2.5 2.5 0 0 1 1.77.73l4.91 4.91a2.5 2.5 0 0 1 .73 1.77V18.5a2.5 2.5 0 0 1-2.5 2.5h-12A2.5 2.5 0 0 1 4 18.5v-13Z" stroke="#8a8268" stroke-width="1.7"/><circle cx="9.2" cy="8.8" r="1.6" fill="#8a8268"/></svg>
-      IdeaSink
+      <span id="brandName">IdeaSink</span>
     </div>
     <div class="deskmenu">
       <span class="presence" id="presence"></span>
@@ -375,7 +375,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="autoBackupBtn">Automatic backup…</button>
         <button id="exportBtn">Back up notes…</button>
         <button id="importBtn">Restore backup…</button>
-        <div class="ver">IdeaSink v32</div>
+        <div class="ver">IdeaSink v33</div>
       </div>
     </div>
   </header>
@@ -473,7 +473,25 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v32';
+const APP_VERSION = 'v33';
+/* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
+   copy is its own separate notebook: own name in the tab + header, own local storage,
+   own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
+const WS = (() => { try{
+  let raw = new URLSearchParams(location.search).get('ws') || '';
+  if(!raw){
+    const f = decodeURIComponent((location.pathname.split('/').pop() || '')).replace(/\.html?$/i, '');
+    if(f && !/^ideasink$/i.test(f) && !/^index$/i.test(f)) raw = f;
+  }
+  return (raw || '').trim();
+}catch(e){ return ''; } })();
+const WSID = WS.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32);
+const WSSUFFIX = WSID ? '-' + WSID : '';
+const WSNAME = WS || 'IdeaSink';
+const USERKEY = 'ideasink-username' + WSSUFFIX, VIEWKEY = 'ideasink-view' + WSSUFFIX,
+      PAGENUMKEY = 'ideasink-pagenums' + WSSUFFIX, LASTDAILYKEY = 'ideasink-lastdaily' + WSSUFFIX;
+try{ document.title = WSNAME; }catch(e){}
+try{ const bn = document.getElementById('brandName'); if(bn) bn.textContent = WSNAME; }catch(e){}
 const $ = s => document.querySelector(s);
 const sheets = $('#sheets'), page = $('#page'), tabrow = $('#tabrow'), tabtools = $('#tabtools');
 const sheetView = $('#sheetView'), editorView = $('#editorView');
@@ -490,8 +508,8 @@ let curSec = null;       // the page currently shown on the sheet view
 let cur = null;          // note open in the editor
 let selIds = new Set(), lastSelId = null;   // multi-selected labels on the sheet
 let useLS = false;       // storage fallback flag
-const LSKEY = 'ideasink-notes-v1';    // v1 (notes only) — read once and migrated
-const LSKEY2 = 'ideasink-data-v2';    // v2 {notes, sections}
+const LSKEY = 'ideasink-notes-v1' + WSSUFFIX;    // v1 (notes only) — read once and migrated
+const LSKEY2 = 'ideasink-data-v2' + WSSUFFIX;    // v2 {notes, sections}
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
 /* ---------------- storage ---------------- */
@@ -500,7 +518,7 @@ let dataRev = 1, backedRev = 0, abTimer = null, dirHandle = null, abLast = null;
 function idb(){
   return new Promise((res, rej) => {
     try{
-      const r = indexedDB.open('ideasink', 3);
+      const r = indexedDB.open('ideasink' + WSSUFFIX, 3);
       r.onupgradeneeded = () => {
         const db = r.result;
         if(!db.objectStoreNames.contains('notes')) db.createObjectStore('notes', { keyPath: 'id' });
@@ -588,7 +606,7 @@ function settingSet(key, value){
 /* ---------------- sheet ---------------- */
 const fmtDate = ts => new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 const PER_SHEET = 21;          /* 3 × 7 labels per sheet; new sheets appear as needed */
-const EXKEY = 'ideasink-extrasheets';
+const EXKEY = 'ideasink-extrasheets' + WSSUFFIX;
 const extraBySec = (() => {    /* per-page count of extra empty sheets, kept until removed */
   try{ return JSON.parse(localStorage.getItem(EXKEY) || '{}') || {}; }catch(e){ return {}; }
 })();
@@ -660,7 +678,7 @@ function renderSheet(){
     const sh = document.createElement('div'); sh.className = 'sheet';
     const brand = document.createElement('div'); brand.className = 'sheet-brand';
     const left = document.createElement('span'), right = document.createElement('span');
-    left.textContent = 'IdeaSink · ' + curSec.name;
+    left.textContent = WSNAME + ' · ' + curSec.name;
     if(si === 0){
       right.textContent = list.length
         ? list.length + (list.length === 1 ? ' label' : ' labels') + (numSheets > 1 ? ' · sheet 1 of ' + numSheets : '')
@@ -1224,7 +1242,7 @@ $('#helpBtn').addEventListener('click', () => {
   showModal({ title: 'How IdeaSink works', body: HELP_HTML, buttons: [{ label: 'Got it', cls: 'primary' }] });
 });
 /* label font — used by label names, page tabs, and the page sticker */
-const LFKEY = 'ideasink-labelfont';
+const LFKEY = 'ideasink-labelfont' + WSSUFFIX;
 const HAND_DEFAULT = "'Bradley Hand','Marker Felt','Segoe Print','Comic Sans MS',cursive";
 function applyLabelFont(name){
   const f = name && typeof FONTS !== 'undefined' ? FONTS.find(x => x[0] === name) : null;
@@ -1295,7 +1313,7 @@ importPick.addEventListener('change', async e => {
 });
 
 /* ---------------- automatic backup ---------------- */
-const ABKEY = 'ideasink-autobackup';
+const ABKEY = 'ideasink-autobackup' + WSSUFFIX;
 const AB = (() => {
   const def = { on: false, mins: 2, mode: window.showDirectoryPicker ? 'folder' : 'download', daily: false };
   try{ return Object.assign(def, JSON.parse(localStorage.getItem(ABKEY) || '{}')); }catch(e){ return def; }
@@ -1333,10 +1351,10 @@ async function doAutoBackup(manual){
     await writeBackupFile('IdeaSink-autobackup.json', json);   /* always just this one file */
     if(AB.daily){
       const today = new Date().toISOString().slice(0, 10);
-      let lastDaily = ''; try{ lastDaily = localStorage.getItem('ideasink-lastdaily') || ''; }catch(e){}
+      let lastDaily = ''; try{ lastDaily = localStorage.getItem(LASTDAILYKEY) || ''; }catch(e){}
       if(lastDaily !== today){
         await writeBackupFile('IdeaSink-backup-' + today + '.json', json);
-        try{ localStorage.setItem('ideasink-lastdaily', today); }catch(e){}
+        try{ localStorage.setItem(LASTDAILYKEY, today); }catch(e){}
       }
     }
     backedRev = dataRev; abLast = { t: Date.now(), ok: true };
@@ -1569,8 +1587,8 @@ const pageNumSel = $('#pageNumSel');
 const pgSize = document.createElement('style'); document.head.appendChild(pgSize);
 const PAPER = { letter: { w: 816, h: 1056, css: 'Letter' }, a4: { w: 794, h: 1123, css: 'A4' } };
 const PAGED = { on: false, mode: '', mV: 96, mH: 76, gap: 26, w: 816, h: 1056, contentH: 864 };
-let VIEWDEF = ''; try{ VIEWDEF = localStorage.getItem('ideasink-view') || ''; }catch(e){}
-let PAGENUMDEF = ''; try{ const v = localStorage.getItem('ideasink-pagenums'); if(v === 'center' || v === 'right') PAGENUMDEF = v; }catch(e){}
+let VIEWDEF = ''; try{ VIEWDEF = localStorage.getItem(VIEWKEY) || ''; }catch(e){}
+let PAGENUMDEF = ''; try{ const v = localStorage.getItem(PAGENUMKEY); if(v === 'center' || v === 'right') PAGENUMDEF = v; }catch(e){}
 /* effective page-number style for a note: its own choice, else the remembered default; only on paged sheets */
 function pageNumOf(note){
   if(!note || !(note.view === 'letter' || note.view === 'a4')) return '';
@@ -1691,7 +1709,7 @@ viewSel.addEventListener('change', () => {
   if(!cur){ viewSel.value = ''; return; }
   const m = (viewSel.value === 'letter' || viewSel.value === 'a4') ? viewSel.value : '';
   cur.view = m;
-  VIEWDEF = m; try{ localStorage.setItem('ideasink-view', m); }catch(e){}
+  VIEWDEF = m; try{ localStorage.setItem(VIEWKEY, m); }catch(e){}
   applyView(m);
   page.focus({ preventScroll: true });
   queueSave();
@@ -1700,7 +1718,7 @@ viewSel.addEventListener('change', () => {
 function setPageNum(v){
   v = (v === 'center' || v === 'right') ? v : '';
   if(cur) cur.pagenum = v;
-  PAGENUMDEF = v; try{ localStorage.setItem('ideasink-pagenums', v); }catch(e){}
+  PAGENUMDEF = v; try{ localStorage.setItem(PAGENUMKEY, v); }catch(e){}
   pageNumSel.value = v;
   if(PAGED.on) schedulePaginate();
 }
@@ -2736,10 +2754,10 @@ addEventListener('blur', () => { closeMenu(); flushSave(); });
 /* ============================================================
    Who am I — a display name used for comments (and live-sync presence)
    ============================================================ */
-let ME = (() => { let n = ''; try{ n = localStorage.getItem('ideasink-username') || ''; }catch(e){} return { name: n }; })();
+let ME = (() => { let n = ''; try{ n = localStorage.getItem(USERKEY) || ''; }catch(e){} return { name: n }; })();
 function myName(){ return ME.name || (typeof SYNC !== 'undefined' && SYNC.name) || ''; }
 function setMyName(n){
-  ME.name = n; try{ localStorage.setItem('ideasink-username', n); }catch(e){}
+  ME.name = n; try{ localStorage.setItem(USERKEY, n); }catch(e){}
   if(typeof SYNC !== 'undefined'){ SYNC.name = n; saveSync(); if(SYNC.on) pushPresence(); }
 }
 function ensureName(cb){
@@ -3000,7 +3018,7 @@ $('#printBtnEd').addEventListener('click', () => { if(cur){ flushSave(); exportP
    the same repo share the same notes (near-live, polled) and can
    see who else is currently in it.
    ============================================================ */
-const SYNCKEY = 'ideasink-sync', TOMBKEY = 'ideasink-tomb';
+const SYNCKEY = 'ideasink-sync' + WSSUFFIX, TOMBKEY = 'ideasink-tomb' + WSSUFFIX;
 const SYNC = (() => {
   const def = { on: false, name: '', userId: '', repo: '', path: 'ideasink-data.json',
                 index: 'index.json', dir: 'notes/', presDir: 'presence/',
