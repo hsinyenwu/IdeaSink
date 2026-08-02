@@ -139,6 +139,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 }
 .ptab:hover{opacity:.95}
 .ptab.active{background:var(--lc,#fff);opacity:1;box-shadow:0 -2px 8px rgba(60,54,38,.10);transform:translateY(1px)}
+.ptab.local{font-weight:800;font-style:italic;color:#5b4b8a}   /* local (this device only) pages stand out */
 .ptab.addtab{
   font:300 17px/1 Arial,sans-serif;color:var(--ink-soft);background:rgba(255,255,255,.4);
   border-style:dashed;padding:6px 13px 7px;
@@ -375,7 +376,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="autoBackupBtn">Automatic backup…</button>
         <button id="exportBtn">Back up notes…</button>
         <button id="importBtn">Restore backup…</button>
-        <div class="ver">IdeaSink v33</div>
+        <div class="ver">IdeaSink v34</div>
       </div>
     </div>
   </header>
@@ -473,7 +474,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v33';
+const APP_VERSION = 'v34';
 /* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
    copy is its own separate notebook: own name in the tab + header, own local storage,
    own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
@@ -511,6 +512,10 @@ let useLS = false;       // storage fallback flag
 const LSKEY = 'ideasink-notes-v1' + WSSUFFIX;    // v1 (notes only) — read once and migrated
 const LSKEY2 = 'ideasink-data-v2' + WSSUFFIX;    // v2 {notes, sections}
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+/* a "local" page (tab) stays on this device only — never uploaded to the shared repo */
+function secById(id){ return sections.find(s => s.id === id); }
+function isLocalSec(s){ const sec = (s && typeof s === 'object') ? s : secById(s); return !!(sec && sec.local); }
+function isLocalNote(n){ return !!(n && isLocalSec(n.sectionId)); }
 
 /* ---------------- storage ---------------- */
 let dbP = null;
@@ -581,18 +586,18 @@ function persist(note){
   if(useLS){ lsSave(); return; }
   withStore('notes', 'readwrite', st => st.put(note)).catch(() => { useLS = true; lsSave(); });
 }
-function unpersist(id){
-  dataRev = Date.now(); syncTouch('del', id);
+function unpersist(id, localOnly){
+  dataRev = Date.now(); if(!localOnly) syncTouch('del', id);
   if(useLS){ lsSave(); return; }
   withStore('notes', 'readwrite', st => st.delete(id)).catch(() => {});
 }
 function persistSec(s){
-  dataRev = Date.now(); syncTouch('sec');
+  dataRev = Date.now(); syncTouch('sec', s);
   if(useLS){ lsSave(); return; }
   withStore('sections', 'readwrite', st => st.put(s)).catch(() => { useLS = true; lsSave(); });
 }
-function unpersistSec(id){
-  dataRev = Date.now(); syncTouch('sec');
+function unpersistSec(id, localOnly){
+  dataRev = Date.now(); if(!localOnly) syncTouch('sec');
   if(useLS){ lsSave(); return; }
   withStore('sections', 'readwrite', st => st.delete(id)).catch(() => {});
 }
@@ -780,12 +785,20 @@ function moveNotes(ids, destId){
   let base = destList.length ? destList[destList.length - 1].order + 1 : 0;
   for(const id of ids){
     const n = notes.find(x => x.id === id);
+    const wasShared = SYNC.on && noteSha[id] && !isLocalNote(n);   /* had a shared copy in the repo */
     n.sectionId = destId;
     n.order = base++;
-    persist(n);
+    if(dest.local && wasShared){                                   /* moved into a private page → remove the shared copy + detach */
+      tombstone('notes', id); delNotes.add(id); dirtyNotes.delete(id);
+      const oldId = n.id; n.id = uid(); n.updated = Date.now();
+      delete noteSha[oldId]; persist(n); unpersist(oldId, true);
+    }else{
+      persist(n);
+    }
   }
   clearSel();
   renderSheet();
+  if(SYNC.on) schedulePush();
   toast('Moved ' + ids.length + ' label' + (ids.length === 1 ? '' : 's') + ' to “' + dest.name + '”');
 }
 /* reorder within the current page: place the set before a target label (or at the end) */
@@ -822,10 +835,10 @@ function renderTabs(){
   tabrow.innerHTML = '';
   for(const s of sections){
     const t = document.createElement('div');
-    t.className = 'ptab' + (curSec && s.id === curSec.id ? ' active' : '');
+    t.className = 'ptab' + (curSec && s.id === curSec.id ? ' active' : '') + (s.local ? ' local' : '');
     t.dataset.sid = s.id;
-    t.textContent = (s.kind === 'sheet' ? '▤ ' : '') + s.name;   /* ▤ marks a single writing page */
-    t.title = s.name + (s.kind === 'sheet' ? ' (single page)' : '');
+    t.textContent = (s.kind === 'sheet' ? '▤ ' : '') + (s.local ? '🔒 ' : '') + s.name;   /* ▤ = single page, 🔒 = local (this device only) */
+    t.title = s.name + (s.kind === 'sheet' ? ' (single page)' : '') + (s.local ? ' — local, this device only (not shared)' : '');
     t.draggable = true;
     if(s.color) t.style.setProperty('--lc', s.color);
     tabrow.appendChild(t);
@@ -923,10 +936,43 @@ tabrow.addEventListener('contextmenu', e => {
     }},
     'sep',
     { label: s.kind === 'sheet' ? 'Turn into a labels sheet' : 'Turn into a single page', onclick: () => convertSection(s) },
+    { label: s.local ? 'Make shared (sync with GitHub)' : 'Make local (this device only)', onclick: () => toggleLocal(s) },
     { label: 'Rename page…', onclick: () => renamePageDialog(s) },
     { label: 'Delete page…', cls: 'mi-danger', onclick: () => confirmDeletePage(s) }
   ]);
 });
+function toggleLocal(s){
+  if(!s.local){
+    const inSec = notes.filter(n => n.sectionId === s.id);
+    const apply = () => {
+      s.local = true; s.updated = Date.now();
+      inSec.forEach(n => {
+        dirtyNotes.delete(n.id);
+        if(SYNC.on && noteSha[n.id]){          /* it was shared → remove it from the repo + re-id the local copy so it's fully detached */
+          tombstone('notes', n.id); delNotes.add(n.id);
+          const oldId = n.id; n.id = uid(); n.updated = Date.now();
+          delete noteSha[oldId]; persist(n); unpersist(oldId, true);
+        }
+      });
+      dirtyIndex = true; persistSec(s);
+      if(SYNC.on) schedulePush();
+      renderSheet();
+      toast('“' + s.name + '” is now local — it stays on this device');
+    };
+    if(SYNC.on && inSec.some(n => noteSha[n.id])){
+      showModal({ title: 'Make “' + s.name + '” local?',
+        body: '<p>Its labels will stop syncing and be <b>removed from the shared copy</b> (others will no longer see them). Your copy stays on this device.</p>',
+        buttons: [{ label: 'Cancel' }, { label: 'Make local', cls: 'primary', onclick: apply }] });
+    }else apply();
+  }else{
+    s.local = false; s.updated = Date.now(); persistSec(s);
+    notes.filter(n => n.sectionId === s.id).forEach(n => { n.updated = Date.now(); dirtyNotes.add(n.id); persist(n); });
+    dirtyIndex = true;
+    if(SYNC.on) schedulePush();
+    renderSheet();
+    toast('“' + s.name + '” is now shared with your repo');
+  }
+}
 function renamePageDialog(s){
   showModal({
     title: 'Rename page', input: s.name,
@@ -950,11 +996,11 @@ function confirmDeletePage(s){
     buttons: [
       { label: 'Cancel' },
       { label: 'Delete page', cls: 'danger', onclick: () => {
-        notes.filter(n => n.sectionId === s.id).forEach(n => { tombstone('notes', n.id); unpersist(n.id); });
+        const local = !!s.local;
+        notes.filter(n => n.sectionId === s.id).forEach(n => { if(local){ unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } });
         notes = notes.filter(n => n.sectionId !== s.id);
         sections = sections.filter(x => x.id !== s.id);
-        tombstone('secs', s.id);
-        unpersistSec(s.id);
+        if(local){ unpersistSec(s.id, true); } else { tombstone('secs', s.id); unpersistSec(s.id); }
         if(!sections.length){
           sections = [{ id: uid(), name: 'Page 1', color: '', order: 0, created: Date.now() }];
           persistSec(sections[0]);
@@ -1130,7 +1176,7 @@ function confirmDelete(n){
     body: '<p>The label and everything written on its page will be removed. This can’t be undone.</p>',
     buttons: [
       { label: 'Cancel' },
-      { label: 'Delete', cls: 'danger', onclick: () => { tombstone('notes', n.id); notes = notes.filter(x => x.id !== n.id); unpersist(n.id); renderSheet(); } }
+      { label: 'Delete', cls: 'danger', onclick: () => { const local = isLocalNote(n); notes = notes.filter(x => x.id !== n.id); if(local){ unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } renderSheet(); } }
     ]
   });
 }
@@ -1243,7 +1289,7 @@ $('#helpBtn').addEventListener('click', () => {
 });
 /* label font — used by label names, page tabs, and the page sticker */
 const LFKEY = 'ideasink-labelfont' + WSSUFFIX;
-const HAND_DEFAULT = "'Bradley Hand','Marker Felt','Segoe Print','Comic Sans MS',cursive";
+const HAND_DEFAULT = "Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', Arimo, sans-serif";
 function applyLabelFont(name){
   const f = name && typeof FONTS !== 'undefined' ? FONTS.find(x => x[0] === name) : null;
   document.documentElement.style.setProperty('--hand', f ? f[1] : HAND_DEFAULT);
@@ -3069,9 +3115,9 @@ $('#sizeWarnX') && $('#sizeWarnX').addEventListener('click', () => { sizeDismiss
 /* record what changed locally so the next push only touches those files */
 function syncTouch(kind, id){
   if(!(syncReady && SYNC.on && !applyingRemote)) return;
-  if(kind === 'note' && id) dirtyNotes.add(id);
+  if(kind === 'note' && id){ const n = notes.find(x => x.id === id); if(n && isLocalNote(n)) return; dirtyNotes.add(id); }
   else if(kind === 'del' && id){ delNotes.add(id); dirtyNotes.delete(id); dirtyIndex = true; }
-  else if(kind === 'sec') dirtyIndex = true;
+  else if(kind === 'sec'){ if(id && typeof id === 'object' && id.local) return; dirtyIndex = true; }
   schedulePush();
 }
 
@@ -3175,7 +3221,7 @@ function pruneTomb(){
 }
 function makeIndex(){     /* the shared index: tabs + tombstones only (labels are separate files) */
   pruneTomb();
-  return { app: 'IdeaSink', v: 4, savedAt: Date.now(), sections, tomb: TOMB };
+  return { app: 'IdeaSink', v: 4, savedAt: Date.now(), sections: sections.filter(s => !s.local), tomb: TOMB };
 }
 /* merge just sections + tombstones from a remote index; marks dirtyIndex when we're ahead */
 function mergeSecTomb(idx){
@@ -3198,8 +3244,8 @@ function mergeSecTomb(idx){
     else if((ls.updated || 0) > (rs.updated || 0)) dirtyIndex = true;
   }
   const rIds = new Set((idx.sections || []).map(s => s.id));
-  sections.forEach(s => { if(!rIds.has(s.id) && !TOMB.secs[s.id]) dirtyIndex = true; });
-  sections = sections.filter(s => { const t = TOMB.secs[s.id] || 0; if(t && t >= (s.updated || s.created || 0)){ changedLocal = true; return false; } return true; });
+  sections.forEach(s => { if(!s.local && !rIds.has(s.id) && !TOMB.secs[s.id]) dirtyIndex = true; });
+  sections = sections.filter(s => { if(s.local) return true; const t = TOMB.secs[s.id] || 0; if(t && t >= (s.updated || s.created || 0)){ changedLocal = true; return false; } return true; });
   if(!sections.length){ const s = { id: uid(), name: 'Page 1', color: '', order: 0, created: Date.now(), updated: Date.now() }; sections.push(s); persistSec(s); }
   sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   return changedLocal;
@@ -3239,7 +3285,7 @@ function mergeRemote(remote){
   }
   const remoteSecIds = new Set((remote.sections || []).map(s => s.id));
   sections.forEach(s => { if(!remoteSecIds.has(s.id) && !(TOMB.secs[s.id])) needPush = true; });
-  sections = sections.filter(s => { const t = TOMB.secs[s.id] || 0; if(t && t >= (s.updated || s.created || 0)){ changedLocal = true; return false; } return true; });
+  sections = sections.filter(s => { if(s.local) return true; const t = TOMB.secs[s.id] || 0; if(t && t >= (s.updated || s.created || 0)){ changedLocal = true; return false; } return true; });
   if(!sections.length){ const s = { id: uid(), name: 'Page 1', color: '', order: 0, created: Date.now(), updated: Date.now() }; sections.push(s); persistSec(s); }
   sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   return { changedLocal, needPush };
@@ -3296,10 +3342,10 @@ async function pullMerge(force){
       else if((rn.updated || 0) > (ln.updated || 0)){ Object.assign(ln, rn); changedLocal = true; }
       else if((ln.updated || 0) > (rn.updated || 0)) dirtyNotes.add(rn.id);   /* our copy is newer → push it */
     }
-    notes.forEach(n => { if(!listedIds.has(n.id) && !TOMB.notes[n.id]) dirtyNotes.add(n.id); });  /* remote never got it */
+    notes.forEach(n => { if(!isLocalNote(n) && !listedIds.has(n.id) && !TOMB.notes[n.id]) dirtyNotes.add(n.id); });  /* remote never got it */
   }
   const before = notes.length;
-  notes = notes.filter(n => { const t = TOMB.notes[n.id] || 0; return !(t && t >= (n.updated || 0)); });
+  notes = notes.filter(n => { if(isLocalNote(n)) return true; const t = TOMB.notes[n.id] || 0; return !(t && t >= (n.updated || 0)); });
   if(notes.length !== before) changedLocal = true;
   notes.forEach(persist); sections.forEach(persistSec); saveTomb();
   applyingRemote = false;
@@ -3358,7 +3404,7 @@ async function doPush(){
     for(const id of noteIds){
       if(TOMB.notes[id]){ dirtyNotes.delete(id); continue; }     /* deleted — don't resurrect */
       const n = notes.find(x => x.id === id);
-      if(!n){ dirtyNotes.delete(id); continue; }
+      if(!n || isLocalNote(n)){ dirtyNotes.delete(id); continue; }   /* gone, or on a local (private) page → never upload */
       await putNote(n); dirtyNotes.delete(id);
     }
     for(const id of delIds){ await deleteNote(id); delNotes.delete(id); }
