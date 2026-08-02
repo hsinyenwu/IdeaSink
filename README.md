@@ -121,9 +121,11 @@ minutes. One person (the owner) does Parts 1–3; the other does Part 4.
 3. Click **Personal access tokens** → **Fine‑grained tokens**.
 4. Click **Generate new token**.
 5. **Token name:** `IdeaSink`. **Expiration:** pick a long one (e.g. 1 year — note when to renew). **Resource owner:** your own account.
-6. Under **Repository access**, choose **Only select repositories** and select `ideasink-notes`.
-7. Under **Permissions → Repository permissions**, set **Contents** to **Read and write** (the only permission needed).
+6. Under **Repository access**, choose **Only select repositories** and select `ideasink-notes`. (Do this *before* the next step — permissions won’t apply until a repository is chosen.)
+7. Scroll to **Permissions → Repository permissions** and click **Add permissions**. In the box that appears, type **Contents** and select it. A small access dropdown then shows up next to **Contents** — set it to **Read and write**. (Heads‑up: the “Read and write” option only appears *after* you add Contents this way. Contents is the only permission needed.)
 8. Click **Generate token** and **copy** it — it starts with `github_pat_…` and is shown only once.
+
+> **Simpler alternative if that screen gives you trouble:** make a **classic** token instead — go to **Developer settings → Personal access tokens → Tokens (classic) → Generate new token (classic)**, name it, set an expiration, tick the single top‑level **`repo`** checkbox, and generate. It works identically in IdeaSink. The only trade‑off is that a classic `repo` token can reach all of your repositories, so keep it private and set an expiration.
 
 ### Part 3 — Turn on sync in IdeaSink
 1. Open IdeaSink → Menu → **Live sync (GitHub)…**.
