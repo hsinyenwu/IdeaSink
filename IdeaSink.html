@@ -70,6 +70,42 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .dropdown hr{border:0;border-top:1px solid var(--line);margin:5px 4px}
 .dropdown .ver{padding:7px 11px 4px;font-size:11px;color:#bcb7a8;letter-spacing:.4px}
 
+#acPop{
+  position:fixed;z-index:210;background:#fff;border:1px solid var(--line);border-radius:9px;
+  box-shadow:0 10px 30px rgba(50,45,30,.22);padding:4px;min-width:120px;max-width:280px;
+  max-height:210px;overflow:auto;font-size:13.5px;
+}
+#acPop .ac-item{padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#acPop .ac-item.active{background:#efeae0}
+#acPop .ac-item:hover{background:#f5f2ea}
+
+#searchOverlay{position:fixed;inset:0;z-index:240;background:rgba(40,36,26,.30);display:flex;justify-content:center;align-items:flex-start}
+#searchBox{width:min(680px,94vw);margin-top:7vh;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 26px 74px rgba(40,35,20,.36);overflow:hidden;display:flex;flex-direction:column;max-height:82vh}
+#searchBar{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+#searchBar svg{flex:0 0 auto;color:#9a927f}
+#searchInput{flex:1;border:0;outline:none;font-size:16px;color:#3a362b;background:none;font-family:inherit}
+#searchClose{flex:0 0 auto;border:0;background:none;color:#a8a293;font-size:15px;cursor:pointer;padding:4px 6px;border-radius:6px}
+#searchClose:hover{background:#f2eee5;color:#6d685c}
+#searchInfo{display:none;justify-content:space-between;align-items:center;gap:10px;padding:6px 12px 6px 15px;font-size:12px;color:#8a8577;border-bottom:1px solid #f2eee2}
+#searchSortWrap{display:inline-flex;align-items:center;gap:6px;color:#9a927f;white-space:nowrap;flex:0 0 auto}
+#searchSort{font-family:inherit;font-size:12px;color:#4c483a;border:1px solid var(--line);border-radius:7px;padding:3px 22px 3px 7px;background:#fff;cursor:pointer}
+#searchResults{overflow:auto;padding:6px 6px 8px}
+.sgroup{margin:0 0 4px}
+.sgroup-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:8px 10px 4px;cursor:pointer;position:sticky;top:0;background:#fff;z-index:1}
+.sgroup-head:hover .sgroup-name{color:#5b4b8a}
+.sgroup-name{font-size:11.5px;font-weight:700;color:#8a7f66;text-transform:uppercase;letter-spacing:.6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sgroup-count{font-size:10.5px;color:#a29a86;background:#f2eee2;border-radius:20px;padding:1px 8px;flex:0 0 auto}
+.sres{padding:7px 10px;border-radius:9px;cursor:pointer;margin-left:6px}
+.sres.active,.sres:hover{background:#f4f1e9}
+.sres-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.sres-tab{font-size:11px;padding:1px 9px;border-radius:20px;background:#ece6d8;color:#5b5344;white-space:nowrap;max-width:44%;overflow:hidden;text-overflow:ellipsis;flex:0 0 auto}
+.sres-name{font-weight:600;color:#3f3b30;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto}
+.sres-kind{font-size:10.5px;color:#b4ae9e;text-transform:uppercase;letter-spacing:.5px;flex:0 0 auto}
+.sres-snip{font-size:12.5px;color:#6d685c;line-height:1.55;max-height:3.1em;overflow:hidden}
+.sres-snip mark,.sres-name mark{background:#ffe58a;color:inherit;border-radius:2px;padding:0 1px}
+#searchEmpty{padding:16px 15px;color:#a8a293;font-size:13px;line-height:1.5}
+::highlight(sfind){background:#ffe27a;color:#1c1a14}
+
 #sheets{padding-bottom:4px}
 .sheet{
   width:min(880px,94vw);margin:14px auto 30px;background:var(--paper);
@@ -128,7 +164,27 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .tabrow{
   flex:1 1 auto;min-width:0;display:flex;gap:6px 6px;flex-wrap:wrap;align-items:flex-end;
 }
-.tabtools{flex:0 0 auto;align-self:center;padding-bottom:6px}
+.tabtools{flex:0 0 auto;align-self:center;padding-bottom:6px;display:flex;gap:6px;align-items:center}
+.stgbtn{
+  position:relative;align-self:center;padding:6px 9px;border-radius:8px;
+  color:var(--ink-soft);border:1px solid rgba(90,80,60,.16);
+  background:rgba(255,255,255,.5);display:inline-flex;align-items:center;
+}
+.stgbtn:hover{background:#fff;color:var(--ink)}
+.stgbtn svg{display:block}
+.stg-badge{
+  position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;
+  background:#8a6d4b;color:#fff;font-size:10px;font-weight:700;border-radius:9px;
+  display:inline-flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;
+}
+.stg-h{font-size:11px;font-weight:700;color:#8a7f66;text-transform:uppercase;letter-spacing:.6px;margin:10px 2px 4px}
+.stg-row{display:flex;align-items:center;gap:9px;padding:6px 2px;border-bottom:1px solid #f0ece0}
+.stg-dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(90,80,60,.2)}
+.stg-name{flex:1;min-width:0;color:#3f3b30;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stg-sub{display:block;font-size:11.5px;font-weight:400;color:#a29a86;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stg-act{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 10px;font-size:12px;cursor:pointer;color:#5b5344}
+.stg-act:hover{background:#f3f0e8}
+.stg-del.armed{background:#c9503a;color:#fff;border-color:#c9503a}
 .ptab{
   flex:0 0 auto;
   font-family:var(--hand);font-weight:700;font-size:15px;color:#3a362e;
@@ -364,12 +420,14 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
     <div class="deskmenu">
       <span class="presence" id="presence"></span>
       <button class="syncdot" id="syncDot" hidden title="Live sync status"></button>
+      <button class="deskbtn" id="searchBtn" title="Search all pages &amp; labels (⌘F / Ctrl-F)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" style="vertical-align:-1px"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.4-4.4"/></svg> Search</button>
       <button class="deskbtn" id="menuBtn">Menu ▾</button>
       <div class="dropdown" id="menuDrop" hidden>
         <button id="helpBtn">How to use</button>
         <button id="nameBtn">Your name…</button>
         <hr>
         <button id="labelFontBtn">Label font…</button>
+        <button id="autofillBtn">Text auto-fill…</button>
         <hr>
         <button id="syncBtn">Live sync (GitHub)…</button>
         <button id="privPassBtn">Private tab password…</button>
@@ -377,7 +435,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="autoBackupBtn">Automatic backup…</button>
         <button id="exportBtn">Back up notes…</button>
         <button id="importBtn">Restore backup…</button>
-        <div class="ver">IdeaSink v36</div>
+        <div class="ver">IdeaSink v40</div>
       </div>
     </div>
   </header>
@@ -459,6 +517,26 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
 </div>
 
 <div class="menu" id="ctxMenu" hidden></div>
+<div id="acPop" hidden></div>
+<div id="searchOverlay" hidden>
+  <div id="searchBox" role="dialog" aria-label="Search notes">
+    <div id="searchBar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.4-4.4"/></svg>
+      <input id="searchInput" type="text" placeholder="Search all pages and labels…" spellcheck="false" autocomplete="off">
+      <button id="searchClose" title="Close (Esc)">✕</button>
+    </div>
+    <div id="searchInfo">
+      <span id="searchCount"></span>
+      <label id="searchSortWrap">Sort<select id="searchSort">
+        <option value="score">Best match</option>
+        <option value="edited">Recently edited</option>
+        <option value="tab">Tab name (A–Z)</option>
+        <option value="name">Name (A–Z)</option>
+      </select></label>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+</div>
 <div id="cmtPop" hidden></div>
 <div id="sizeWarn" hidden><span class="sw-text"></span><button class="sw-x" id="sizeWarnX" title="Dismiss">×</button></div>
 <div class="picker" id="tablePicker" hidden><div class="pgrid" id="pgrid"></div><div class="plabel" id="plabel">1 × 1</div></div>
@@ -475,7 +553,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v36';
+const APP_VERSION = 'v40';
 /* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
    copy is its own separate notebook: own name in the tab + header, own local storage,
    own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
@@ -502,6 +580,8 @@ const sizeSel = $('#sizeSel'), fontSel = $('#fontSel'), lineSel = $('#lineSel'),
 const savedTag = $('#savedTag'), noteTitle = $('#noteTitle'), pageTab = $('#pageTab');
 const filePick = $('#filePick'), importPick = $('#importPick');
 const ctxMenu = $('#ctxMenu'), picker = $('#tablePicker'), pgrid = $('#pgrid'), plabel = $('#plabel');
+const acPop = $('#acPop');
+const searchOverlay = $('#searchOverlay'), searchInput = $('#searchInput'), searchResults = $('#searchResults'), searchInfo = $('#searchInfo'), searchCountEl = $('#searchCount'), searchSort = $('#searchSort');
 const overlay = $('#overlay'), modal = $('#modal'), imgHandle = $('#imgHandle');
 
 let notes = [];          // {id, name, color, content, sectionId, order, created, updated}
@@ -618,7 +698,7 @@ const extraBySec = (() => {    /* per-page count of extra empty sheets, kept unt
 })();
 function saveExtras(){ try{ localStorage.setItem(EXKEY, JSON.stringify(extraBySec)); }catch(e){} }
 function secNotes(){
-  return notes.filter(n => n.sectionId === curSec.id && !n.sheet).sort((a, b) => a.order - b.order);
+  return notes.filter(n => n.sectionId === curSec.id && !n.sheet && !n.archived).sort((a, b) => a.order - b.order);
 }
 /* parse a label color ('hsl(h,s%,l%)' from the palette, or legacy '#rrggbb') into hue/sat/light */
 function parseColor(c){
@@ -825,7 +905,7 @@ function moveNotesBefore(ids, beforeId){
   renderSheet();
 }
 function movePagesMenuItems(ids){
-  const items = sections.filter(s => s.id !== curSec.id)
+  const items = sections.filter(s => s.id !== curSec.id && !s.archived)
     .map(s => ({ label: 'Move to “' + s.name + '”', onclick: () => moveNotes(ids, s.id) }));
   items.push({ label: '＋ Move to a new page…', onclick: () => newPageDialog(s2 => moveNotes(ids, s2.id)) });
   return items;
@@ -841,6 +921,7 @@ $('#selClearBtn').addEventListener('click', clearSel);
 function renderTabs(){
   tabrow.innerHTML = '';
   for(const s of sections){
+    if(s.archived) continue;                       /* in storage — hidden from the tab bar */
     const t = document.createElement('div');
     t.className = 'ptab' + (curSec && s.id === curSec.id ? ' active' : '') + (s.local ? ' local' : '');
     t.dataset.sid = s.id;
@@ -880,6 +961,14 @@ function renderTabs(){
     });
     tabtools.appendChild(sortBtn);
   }
+  /* storage (archive) symbol — always here; shows a count when something is stored */
+  const stg = document.createElement('button');
+  stg.className = 'stgbtn'; stg.id = 'storageBtn';
+  const cnt = storageCount();
+  stg.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/></svg>' + (cnt ? '<span class="stg-badge">' + cnt + '</span>' : '');
+  stg.title = 'Storage — archived tabs & labels' + (cnt ? ' (' + cnt + ')' : '') + '. Right-click a tab or label → Move to storage.';
+  stg.addEventListener('click', openStorage);
+  tabtools.appendChild(stg);
 }
 /* ensure & return the single hidden note that backs a "single page" main page */
 function sheetNote(sec){
@@ -945,6 +1034,7 @@ tabrow.addEventListener('contextmenu', e => {
     { label: s.kind === 'sheet' ? 'Turn into a labels sheet' : 'Turn into a single page', onclick: () => convertSection(s) },
     { label: s.local ? 'Make shared (everyone sees it)' : 'Make private (only you)', onclick: () => toggleLocal(s) },
     { label: 'Rename page…', onclick: () => renamePageDialog(s) },
+    { label: 'Move to storage 🗄️', onclick: () => archiveSection(s) },
     { label: 'Delete page…', cls: 'mi-danger', onclick: () => confirmDeletePage(s) }
   ]);
 });
@@ -1021,6 +1111,96 @@ function confirmDeletePage(s){
         renderSheet();
       }}
     ]
+  });
+}
+
+/* ============================================================
+   Storage (archive) — put an old tab or a single label away without deleting it.
+   A tab keeps section.archived; a label keeps note.archived (and its sectionId, so
+   it restores to the same tab). Both still save & sync like normal — private ones
+   stay in your private area — they're just hidden from the tab bar / sheet until
+   you restore them. computeSearch skips them so storage stays out of the way.
+   ============================================================ */
+function archivedSecs(){ return sections.filter(s => s.archived); }
+function archivedLabels(){ return notes.filter(n => n.archived && !n.sheet); }
+function storageCount(){ return archivedSecs().length + archivedLabels().length; }
+function archiveSection(s){
+  if(sections.filter(x => !x.archived).length <= 1){ toast('Keep at least one tab out of storage'); return; }
+  s.archived = true; s.updated = Date.now(); persistSec(s);
+  const wasCurrent = !curSec || curSec.id === s.id;
+  if(wasCurrent) curSec = sections.find(x => !x.archived) || sections[0];
+  toast('Moved “' + (s.name || 'page') + '” to storage');
+  renderTabs();
+  if(wasCurrent){ const t = '#sec/' + curSec.id; if(location.hash === t) route(); else location.hash = t; }
+  else renderSheet();
+}
+function restoreSection(s){
+  s.archived = false; s.updated = Date.now(); persistSec(s);
+  toast('Restored “' + (s.name || 'page') + '”'); renderTabs();
+}
+function archiveNote(n, bulk){
+  n.archived = true; n.updated = Date.now(); persist(n);
+  if(!bulk){ toast('Moved “' + (n.name || 'label') + '” to storage'); renderTabs(); renderSheet(); }
+}
+function restoreNote(n){
+  n.archived = false; n.updated = Date.now();
+  let sec = secById(n.sectionId);
+  if(!sec || sec.archived){ const first = sections.find(x => !x.archived) || sections[0]; if(first){ n.sectionId = first.id; sec = first; } }
+  persist(n);
+  toast('Restored “' + (n.name || 'label') + '”' + (sec ? ' to “' + sec.name + '”' : ''));
+  renderTabs(); renderSheet();
+}
+function hardDeleteSection(s){
+  const priv = !!s.local;
+  notes.filter(n => n.sectionId === s.id).forEach(n => { if(priv){ privTombstone('notes', n.id); unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } });
+  notes = notes.filter(n => n.sectionId !== s.id);
+  sections = sections.filter(x => x.id !== s.id);
+  if(priv){ privTombstone('secs', s.id); unpersistSec(s.id, true); privDirty = true; if(SYNC.on) schedulePush(); } else { tombstone('secs', s.id); unpersistSec(s.id); }
+  if(!sections.length){ sections = [{ id: uid(), name: 'Page 1', color: '', order: 0, created: Date.now() }]; persistSec(sections[0]); }
+  if(!curSec || !sections.includes(curSec) || curSec.archived) curSec = sections.find(x => !x.archived) || sections[0];
+  delete extraBySec[s.id]; saveExtras();
+  renderTabs(); renderSheet();
+}
+function hardDeleteNote(n){
+  const priv = isLocalNote(n);
+  notes = notes.filter(x => x.id !== n.id);
+  if(priv){ privTombstone('notes', n.id); unpersist(n.id, true); privDirty = true; if(SYNC.on) schedulePush(); } else { tombstone('notes', n.id); unpersist(n.id); }
+  renderTabs(); renderSheet();
+}
+function openStorage(){
+  closeMenu(); const md = $('#menuDrop'); if(md) md.hidden = true;
+  const body = '<p style="color:#57523f;margin:0 0 8px;font-size:13px">Tabs and labels you’ve put away. They’re kept and still backed up &amp; synced — private ones stay private — just hidden until you restore them. A restored label returns to the tab it came from.</p>' +
+    '<div id="stgList" style="max-height:344px;overflow:auto;margin:0 -2px"></div>';
+  showModal({ title: 'Storage 🗄️', body, buttons: [{ label: 'Done', cls: 'primary' }] });
+  const list = $('#stgList');
+  const row = (type, id, label, sub, color) =>
+    '<div class="stg-row" data-type="' + type + '" data-id="' + esc(id) + '">' +
+      '<span class="stg-dot" style="background:' + (color || '#e7e2d5') + '"></span>' +
+      '<span class="stg-name">' + label + '<span class="stg-sub">' + sub + '</span></span>' +
+      '<button class="stg-act stg-restore">Restore</button>' +
+      '<button class="stg-act stg-del">Delete</button></div>';
+  const render = () => {
+    const secs = archivedSecs(), labs = archivedLabels();
+    if(!secs.length && !labs.length){ list.innerHTML = '<div style="color:#a8a293;font-size:13px;padding:12px 2px;line-height:1.6">Nothing in storage yet.<br>Right-click a tab or a label → <b>Move to storage 🗄️</b> to keep it here without deleting.</div>'; return; }
+    let html = '';
+    if(secs.length){ html += '<div class="stg-h">Tabs</div>' + secs.map(s => row('sec', s.id, (s.local ? '🔒 ' : '') + (s.kind === 'sheet' ? '▤ ' : '') + esc(s.name || 'Untitled'), s.kind === 'sheet' ? 'single page' : 'sheet of labels', s.color)).join(''); }
+    if(labs.length){ html += '<div class="stg-h">Labels</div>' + labs.map(n => { const sec = secById(n.sectionId); return row('note', n.id, (isLocalNote(n) ? '🔒 ' : '') + esc(n.name || 'Untitled'), sec ? 'from “' + esc(sec.name) + '”' : 'from a deleted tab', n.color); }).join(''); }
+    list.innerHTML = html;
+  };
+  render();
+  list.addEventListener('click', e => {
+    const r = e.target.closest('.stg-row'); if(!r) return;
+    const type = r.dataset.type, id = r.dataset.id;
+    if(e.target.closest('.stg-restore')){
+      if(type === 'sec'){ const s = secById(id); if(s) restoreSection(s); } else { const n = notes.find(x => x.id === id); if(n) restoreNote(n); }
+      render(); return;
+    }
+    const del = e.target.closest('.stg-del');
+    if(del){
+      if(del.dataset.armed !== '1'){ del.dataset.armed = '1'; del.textContent = 'Delete?'; del.classList.add('armed'); return; }
+      if(type === 'sec'){ const s = secById(id); if(s) hardDeleteSection(s); } else { const n = notes.find(x => x.id === id); if(n) hardDeleteNote(n); }
+      render();
+    }
   });
 }
 
@@ -1155,10 +1335,11 @@ sheets.addEventListener('contextmenu', e => {
   if(selIds.has(n.id) && selIds.size > 1){
     /* right-click on one of several selected labels → act on the whole selection */
     const ids = [...selIds];
-    const items = sections.filter(s => s.id !== curSec.id)
+    const items = sections.filter(s => s.id !== curSec.id && !s.archived)
       .map(s => ({ label: 'Move ' + ids.length + ' labels to “' + s.name + '”', onclick: () => moveNotes(ids, s.id) }));
     items.push({ label: '＋ Move ' + ids.length + ' labels to a new page…', onclick: () => newPageDialog(s2 => moveNotes(ids, s2.id)) });
-    items.push('sep', { label: 'Clear selection', onclick: clearSel });
+    items.push('sep', { label: 'Move ' + ids.length + ' labels to storage 🗄️', onclick: () => { ids.forEach(id => { const nn = notes.find(x => x.id === id); if(nn) archiveNote(nn, true); }); clearSel(); renderTabs(); renderSheet(); } });
+    items.push({ label: 'Clear selection', onclick: clearSel });
     openMenu(e.clientX, e.clientY, items);
     return;
   }
@@ -1176,6 +1357,7 @@ sheets.addEventListener('contextmenu', e => {
     'sep',
     { label: 'Rename', onclick: () => startNaming(el, n) },
     { label: 'Save as (Word / text / PDF)…', onclick: () => exportDialog(n) },
+    { label: 'Move to storage 🗄️', onclick: () => archiveNote(n) },
     { label: 'Delete label…', cls: 'mi-danger', onclick: () => confirmDelete(n) }
   ]));
 });
@@ -1277,6 +1459,7 @@ const HELP_HTML =
   '<li><b>Pages</b> — the tabs on top are separate main pages. “＋” adds one and asks whether it should be a <b>sheet of labels</b> or a <b>single writing page</b> (marked ▤). Right-click a tab to switch it between the two, recolor, rename, or delete it; drag tabs to reorder. When one row of tabs fills up, they continue on the next row.</li>' +
   '<li><b>Name a label</b> — click an empty label, type, press Enter.</li>' +
   '<li><b>Open its page</b> — click a named label. Everything saves as you type.</li>' +
+  '<li><b>Search</b> — the “Search” button (top-right, or ⌘F / Ctrl-F) looks through <i>every</i> tab, label, and page at once and lists which ones contain your words. Type several words to require all of them, or put "quotes" around an exact phrase. Click a result (or use ↑/↓ and Enter) to jump straight there, with the first match highlighted on the page.</li>' +
   '<li><b>Rearrange</b> — drag a label onto another label to reorder it, or drop it on a page tab to move it to that page. The “Sort” button (right of the tabs) arranges a page alphabetically, by date, or by color (rainbow order — matching colors sit together); each page remembers its own choice.</li>' +
   '<li><b>Select several</b> — ⌘-click labels (Shift-click for a range, ⌘A for all), then move them together with the bar at the bottom, by right-clicking one of them, or by dragging the group onto a page tab.</li>' +
   '<li><b>Format text</b> — select text, then use the toolbar: font, size, <b>B</b>, <i>I</i>, <u>U</u>, the <b>S</b> button to cross out (strikethrough), the <b>A</b> button for text color, the marker for highlight, the <b>↕</b> menu for line spacing (select some rows and choose a spacing — it applies to just those paragraphs), and the list buttons for bullets or numbering. The ↶ ↷ buttons (or ⌘Z / ⌘⇧Z) undo and redo. In a list, Tab / Shift-Tab indents an item, and pressing Enter on an empty bullet leaves the list (or click the list button again to turn it off).</li>' +
@@ -1538,6 +1721,7 @@ function showMode(mode){
 function openNoteInEditor(n, mode){
   cur = n;
   n.accessed = Date.now(); persist(n);
+  afHide(); afRefreshDict();
   noteTitle.value = n.name;
   updateTab();
   page.innerHTML = n.content || '';
@@ -1553,10 +1737,11 @@ function openNoteInEditor(n, mode){
     viewSel.value = rv; applyView(rv); }
   scrollTo(0, 0);
   page.focus({ preventScroll: true });
+  if(searchHL){ const hl = searchHL; searchHL = null; setTimeout(() => searchHighlightFirst(hl), 40); }
 }
 function route(){
   flushSave();
-  closeMenu(); hidePicker(); hideModal(); deselectImg();
+  closeMenu(); hidePicker(); hideModal(); deselectImg(); afHide();
   selIds.clear(); lastSelId = null; updateSelUI();
   /* a #sec pointing at a single-page main page redirects to its backing note */
   const secM = location.hash.match(/^#sec\/(.+)$/);
@@ -1579,7 +1764,7 @@ function route(){
     return;
   }
   if(secM){ const s = sections.find(x => x.id === secM[1]); if(s) curSec = s; }
-  if(!curSec || !sections.includes(curSec)) curSec = sections[0];
+  if(!curSec || !sections.includes(curSec) || curSec.archived) curSec = sections.find(x => !x.archived) || sections[0];
   if(curSec.kind === 'sheet'){ history.replaceState(null, '', '#note/' + sheetNote(curSec).id); return route(); }
   cur = null;
   showMode('grid');
@@ -1631,6 +1816,400 @@ function pruneComments(){
   for(const cid of Object.keys(cur.comments)){ if(!live.has(cid)) delete cur.comments[cid]; }
 }
 page.addEventListener('input', () => { queueSave(); updateEmpty(); schedulePaginate(); });
+
+/* ============================================================
+   Text auto-fill — word suggestions as you type + custom shortcut expansion.
+   Kept per-device (localStorage, namespaced). Insertions go through execCommand
+   so the browser's own undo/redo keeps working, and paginating stays consistent.
+   ============================================================ */
+const AFKEY = 'ideasink-autofill' + WSSUFFIX;
+let AF = { ac: true, sn: true, snips: [] };
+function afLoad(){
+  try{
+    const j = JSON.parse(localStorage.getItem(AFKEY) || 'null');
+    if(j && typeof j === 'object'){
+      AF.ac = j.ac !== false; AF.sn = j.sn !== false;
+      AF.snips = Array.isArray(j.snips) ? j.snips.filter(s => s && s.c && s.t).map(s => ({ c: String(s.c), t: String(s.t) })) : [];
+    }
+  }catch(e){}
+}
+function afSave(){ try{ localStorage.setItem(AFKEY, JSON.stringify(AF)); }catch(e){} }
+afLoad();
+
+/* a compact list of common English words so suggestions are useful even in a fresh notebook */
+const AF_COMMON = ('the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us able about above across add afraid after again against age ago agree air all allow almost alone along already also always among amount ancient anger angry animal another answer appear apply area argue arm around arrive art ask attack away baby back bad bag ball bank base beautiful become bed been before begin behind believe below best better between big bird black blood blue board boat body book born both box boy break bring brother build business buy call came cannot care carry case catch cause cell center certain chance change child choose city class clear close cold color come common community company complete consider continue control cost could country course cover create cut dark data day dead deal death decide deep develop did die different difficult direction do does dog done door down draw dream drink drive drop during each early earth easy eat education effect either else end enough enter even evening ever every example experience explain eye face fact fall family far fast father fear feel few field fight figure fill final find fine fire first fish five follow food foot force form found free friend from front full future game garden gave general get girl give glad go good got government great green ground group grow guess hand happen happy hard have head hear heart heavy held help her here high history hold home hope hour house how however human idea imagine important include increase indeed information inside instead interest into it job just keep kind knew know land large last late later laugh lead learn leave left less let letter level lie life light like line list listen little live local long look lot love low machine made main make many mark matter may mean meet member might mind minute miss moment money month more morning most mother move much music must name near need never new news next nice night north note nothing notice now number obtain occur ocean off offer office often oil once only open order other over own page paper part party pass past pay people perhaps period person picture place plan plant play please point poor possible power prepare present president press pretty probably problem produce program provide public pull purpose put question quick quiet quite rather reach read ready real realize reason receive record red remember report rest result return rich right rise river road room round rule run said same save saw say school science sea season seat second see seem sell send sense sentence serve service set several shall share short should show side simple since sing single sister sit six size sleep small smile snow social some something sometimes soon sound south space speak special spend spring stand start state stay step still stop story street strong student study such summer sun sure surface system table take talk teach team tell than thank that their them themselves then there these they thing think third this those though thought thousand three through time today together told too took top toward town travel tree true try turn under understand until upon use usually value very view visit voice wait walk want war watch water way weather week well went were what when where whether which while white who whole why wide wife will wind window winter wish within without woman word work world would write wrong year yes yesterday yet young').split(' ');
+
+let acScores = new Map();
+function afHarvest(html, weight){
+  if(!html) return;
+  const d = document.createElement('div'); d.innerHTML = html;
+  d.querySelectorAll('img,script,style,.pg-space,.cmark').forEach(x => x.remove());
+  const text = d.textContent || '';
+  const m = text.match(/[A-Za-z][A-Za-z'’]{2,}/g); if(!m) return;
+  for(let w of m){ w = w.toLowerCase(); acScores.set(w, (acScores.get(w) || 0) + weight); }
+}
+function afBuildDict(){
+  acScores = new Map();
+  for(let i = 0; i < AF_COMMON.length; i++){ const w = AF_COMMON[i]; if(w.length >= 3) acScores.set(w, Math.max(acScores.get(w) || 0, 1 + (AF_COMMON.length - i) / AF_COMMON.length * 3)); }
+  for(const n of notes){ afHarvest(n.content, 8); if(n.name) afHarvest(n.name, 6); }
+}
+let acBuiltAt = 0;
+function afRefreshDict(){ const t = Date.now(); if(t - acBuiltAt > 4000){ afBuildDict(); acBuiltAt = t; } }
+function afRecase(w, prefix){
+  if(prefix.length >= 2 && prefix === prefix.toUpperCase() && prefix !== prefix.toLowerCase()) return w.toUpperCase();
+  if(prefix[0] === prefix[0].toUpperCase() && prefix[0] !== prefix[0].toLowerCase()) return w.charAt(0).toUpperCase() + w.slice(1);
+  return w;
+}
+function afSuggest(prefix){
+  const lp = prefix.toLowerCase(); const hits = [];
+  acScores.forEach((score, w) => { if(w.length > lp.length && w.startsWith(lp)) hits.push([w, score]); });
+  hits.sort((a, b) => b[1] - a[1] || a[0].length - b[0].length || (a[0] < b[0] ? -1 : 1));
+  const res = [];
+  for(const [w] of hits){ res.push(afRecase(w, prefix)); if(res.length >= 6) break; }
+  return res;
+}
+
+/* --- caret helpers (single text node — the normal case while typing a word) --- */
+function caretInfo(){
+  const s = getSelection(); if(!s.rangeCount) return null;
+  const r = s.getRangeAt(0); if(!r.collapsed) return null;
+  const node = r.startContainer;
+  if(!node || node.nodeType !== 3 || !page.contains(node)) return null;
+  return { node, off: r.startOffset, range: r };
+}
+function caretWord(){
+  const ci = caretInfo(); if(!ci) return null;
+  const m = ci.node.data.slice(0, ci.off).match(/[A-Za-z][A-Za-z'’]*$/);
+  if(!m) return null;
+  return { node: ci.node, off: ci.off, prefix: m[0], range: ci.range };
+}
+
+/* --- the suggestion popup --- */
+let acItems = [], acActive = -1;
+function afHide(){ if(acPop && !acPop.hidden){ acPop.hidden = true; } acItems = []; acActive = -1; }
+function afRenderActive(){ [...acPop.children].forEach((c, i) => c.classList.toggle('active', i === acActive)); }
+function afShow(items, w){
+  acItems = items; acActive = 0;
+  acPop.innerHTML = items.map((t, i) => '<div class="ac-item' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' + esc(t) + '</div>').join('');
+  acPop.hidden = false;
+  let rect = w.range.getBoundingClientRect();
+  if(!rect.width && !rect.height && !rect.top && !rect.left){ rect = (w.node.parentElement || page).getBoundingClientRect(); }
+  const pw = acPop.offsetWidth, ph = acPop.offsetHeight;
+  let left = Math.max(6, Math.min(rect.left, innerWidth - pw - 8));
+  let top = rect.bottom + 4;
+  if(top + ph > innerHeight - 6) top = Math.max(6, rect.top - ph - 4);
+  acPop.style.left = left + 'px'; acPop.style.top = top + 'px';
+}
+function afMove(d){ if(!acItems.length) return; acActive = (acActive + d + acItems.length) % acItems.length; afRenderActive(); }
+function afAccept(){
+  if(acPop.hidden || acActive < 0 || !acItems[acActive]) return false;
+  const w = caretWord(); if(!w){ afHide(); return false; }
+  const sug = acItems[acActive];
+  if(sug.toLowerCase().indexOf(w.prefix.toLowerCase()) !== 0){ afHide(); return false; }
+  const suffix = sug.slice(w.prefix.length);
+  afBusy = true; try{ document.execCommand('insertText', false, suffix); }catch(e){} afBusy = false;
+  afHide(); return true;
+}
+function afKeydown(e){
+  if(acPop.hidden) return false;
+  if(e.key === 'ArrowDown'){ e.preventDefault(); afMove(1); return true; }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); afMove(-1); return true; }
+  if(e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); afAccept(); return true; }
+  if(e.key === 'Escape'){ e.preventDefault(); afHide(); return true; }
+  return false;
+}
+acPop.addEventListener('mousedown', e => { e.preventDefault(); const it = e.target.closest('.ac-item'); if(it){ acActive = +it.dataset.i; afAccept(); } });
+
+/* --- shortcut (snippet) expansion --- */
+let afBusy = false;
+function afFindSnip(code){
+  let hit = AF.snips.find(s => s.c === code);
+  if(!hit) hit = AF.snips.find(s => s.c.toLowerCase() === code.toLowerCase());
+  return hit ? hit.t : null;
+}
+function afInsert(text){
+  /* insert line by line so newlines become clean single breaks (no stray blank lines),
+     while single-line inserts stay one native undo step */
+  const parts = String(text).split(/\r?\n/);
+  for(let i = 0; i < parts.length; i++){
+    if(i > 0) document.execCommand('insertLineBreak');
+    if(parts[i]) document.execCommand('insertText', false, parts[i]);
+  }
+}
+function afReplace(node, a, b, text){
+  const r = document.createRange(); r.setStart(node, a); r.setEnd(node, b);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+  afBusy = true; try{ afInsert(text); }catch(e){} afBusy = false;
+}
+/* Tab: the whole word before the caret is the code (no trailing trigger to keep) */
+function afTryExpand(){
+  if(!AF.sn) return false;
+  const ci = caretInfo(); if(!ci) return false;
+  const m = ci.node.data.slice(0, ci.off).match(/[A-Za-z][\w'’\-]*$/); if(!m) return false;
+  const exp = afFindSnip(m[0]); if(exp == null) return false;
+  afReplace(ci.node, ci.off - m[0].length, ci.off, exp); afHide(); return true;
+}
+/* space / punctuation: expand the code but keep the trigger character that was just typed */
+function afExpandTrigger(){
+  if(!AF.sn) return false;
+  const ci = caretInfo(); if(!ci) return false;
+  const m = ci.node.data.slice(0, ci.off).match(/([A-Za-z][\w'’\-]*)([\s.,;:!?)\]}'"])$/); if(!m) return false;
+  const exp = afFindSnip(m[1]); if(exp == null) return false;
+  const codeStart = ci.off - m[2].length - m[1].length, trigStart = ci.off - m[2].length;
+  afReplace(ci.node, codeStart, trigStart, exp); afHide(); return true;
+}
+function afUpdateSuggest(){
+  if(!AF.ac){ afHide(); return; }
+  const w = caretWord();
+  if(!w || w.prefix.length < 2){ afHide(); return; }
+  const list = afSuggest(w.prefix);
+  if(!list.length || (list.length === 1 && list[0].toLowerCase() === w.prefix.toLowerCase())){ afHide(); return; }
+  afShow(list, w);
+}
+let afHarvestT = 0;
+page.addEventListener('input', e => {
+  if(afBusy) return;
+  if(AF.sn && e && e.inputType === 'insertText' && e.data && e.data.length === 1 && /[\s.,;:!?)\]}'"]/.test(e.data)){
+    if(afExpandTrigger()) return;
+  }
+  afUpdateSuggest();
+  clearTimeout(afHarvestT);
+  afHarvestT = setTimeout(() => { if(!editorView.hidden && cur) afHarvest(page.innerHTML, 4); }, 500);
+});
+/* dismiss the popup when the caret moves by mouse or the view scrolls */
+addEventListener('mousedown', e => { if(!acPop.hidden && !acPop.contains(e.target)) afHide(); }, true);
+addEventListener('scroll', () => { if(!acPop.hidden) afHide(); }, true);
+
+/* --- settings + shortcut manager (Menu → Text auto-fill…) --- */
+function afDialog(){
+  $('#menuDrop').hidden = true;
+  const F = 'width:100%;padding:8px 10px;border:1px solid #d5d0c2;border-radius:8px;font:inherit';
+  const body =
+    '<p style="color:#57523f;margin:0 0 8px">Two helpers while you’re writing on a page:</p>' +
+    '<label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="checkbox" id="afAc"' + (AF.ac ? ' checked' : '') + ' style="margin-top:3px"><span><b>Suggest words as I type</b><br><span style="color:#8a8577;font-size:12.5px">A little list pops up from words you’ve used (and common words). Press <b>Tab</b> or <b>Enter</b> to accept it, or just keep typing to ignore it.</span></span></label>' +
+    '<label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="checkbox" id="afSn"' + (AF.sn ? ' checked' : '') + ' style="margin-top:3px"><span><b>Expand my shortcuts</b><br><span style="color:#8a8577;font-size:12.5px">Type a short code then <b>space</b> (or <b>Tab</b>) and it becomes the full text.</span></span></label>' +
+    '<div style="border-top:1px solid #e7e2d5;margin:10px 0 8px"></div>' +
+    '<div style="font-weight:600;color:#4c483a;margin:0 0 6px">Your shortcuts</div>' +
+    '<div id="afList" style="max-height:180px;overflow:auto;margin:0 0 8px"></div>' +
+    '<div style="display:flex;gap:6px;align-items:flex-start">' +
+      '<input id="afCode" type="text" placeholder="code" spellcheck="false" style="' + F + ';flex:0 0 30%">' +
+      '<textarea id="afText" rows="2" placeholder="what it expands to…" spellcheck="false" style="' + F + ';flex:1;resize:vertical"></textarea>' +
+      '<button class="btn" id="afAdd" style="flex:0 0 auto">Add</button>' +
+    '</div>' +
+    '<p style="font-size:12px;color:#8a8577;margin:8px 0 0">Example: code <code>sig</code> → “Best regards, Larry”. Kept on this device.</p>';
+  showModal({ title: 'Text auto-fill', body, buttons: [{ label: 'Done', cls: 'primary' }] });
+  const list = $('#afList');
+  const render = () => {
+    if(!AF.snips.length){ list.innerHTML = '<div style="color:#a8a293;font-size:12.5px;padding:4px 2px">No shortcuts yet — add one below.</div>'; return; }
+    list.innerHTML = AF.snips.map((s, i) => '<div style="display:flex;gap:8px;align-items:center;padding:4px 2px;border-bottom:1px solid #f0ece0"><code style="flex:0 0 30%;color:#5b4b8a;font-weight:600;word-break:break-all">' + esc(s.c) + '</code><span style="flex:1;color:#57523f;font-size:12.5px;white-space:pre-wrap;overflow:hidden;max-height:2.7em">' + esc(s.t) + '</span><button class="afDel" data-i="' + i + '" title="Delete" style="flex:0 0 auto;border:0;background:none;color:#b6644b;cursor:pointer;font-size:17px;line-height:1">×</button></div>').join('');
+  };
+  render();
+  $('#afAc').addEventListener('change', e => { AF.ac = e.target.checked; afSave(); if(!AF.ac) afHide(); });
+  $('#afSn').addEventListener('change', e => { AF.sn = e.target.checked; afSave(); });
+  $('#afAdd').addEventListener('click', () => {
+    const c = ($('#afCode').value || '').trim(), t = $('#afText').value || '';
+    if(!c || !t.trim()){ toast('Enter a code and its text'); return; }
+    if(/\s/.test(c)){ toast('The code can’t contain spaces'); return; }
+    const ex = AF.snips.find(s => s.c === c); if(ex) ex.t = t; else AF.snips.push({ c, t });
+    afSave(); render(); $('#afCode').value = ''; $('#afText').value = ''; $('#afCode').focus();
+  });
+  list.addEventListener('click', e => { const b = e.target.closest('.afDel'); if(!b) return; AF.snips.splice(+b.dataset.i, 1); afSave(); render(); });
+}
+$('#autofillBtn').addEventListener('click', afDialog);
+
+/* ============================================================
+   Search — find which tab / label / page contains given words.
+   Space-separated words = all must appear (AND); "quoted text" = exact phrase.
+   Results jump straight to the page, then highlight the first match there.
+   ============================================================ */
+let searchCache = new Map();      // note.id -> { updated, text, lower }
+let searchItems = [], searchActive = -1, searchQ = '', searchHL = null, searchT = 0, sfindT = 0, searchAll = [];
+const SEARCHSORTKEY = 'ideasink-searchsort' + WSSUFFIX;
+let searchSortMode = 'score';
+try{ const v = localStorage.getItem(SEARCHSORTKEY); if(['score', 'edited', 'tab', 'name'].includes(v)) searchSortMode = v; }catch(e){}
+function saveSearchSort(){ try{ localStorage.setItem(SEARCHSORTKEY, searchSortMode); }catch(e){} }
+function searchNoteText(n){
+  const d = document.createElement('div'); d.innerHTML = n.content || '';
+  d.querySelectorAll('img,script,style,.pg-space,.cmark').forEach(x => x.remove());
+  return (d.textContent || '').replace(/\s+/g, ' ').trim();
+}
+function searchCached(n){
+  const c = searchCache.get(n.id);
+  if(c && c.updated === (n.updated || 0)) return c;
+  const text = searchNoteText(n);
+  const rec = { updated: n.updated || 0, text, lower: text.toLowerCase() };
+  searchCache.set(n.id, rec); return rec;
+}
+function searchParse(q){
+  const terms = []; const re = /"([^"]+)"|(\S+)/g; let m;
+  while((m = re.exec(q))){ const t = (m[1] || m[2] || '').trim().toLowerCase(); if(t) terms.push(t); }
+  return terms;
+}
+function searchCount(lower, terms){ let n = 0; for(const t of terms){ let i = lower.indexOf(t); while(i >= 0){ n++; i = lower.indexOf(t, i + t.length); } } return n; }
+function searchEscTerms(terms){ return terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).filter(Boolean); }
+function searchMark(escaped, terms){
+  const e = searchEscTerms(terms); if(!e.length) return escaped;
+  try{ return escaped.replace(new RegExp('(' + e.join('|') + ')', 'gi'), '<mark>$1</mark>'); }catch(x){ return escaped; }
+}
+function searchSnippet(text, terms){
+  if(!text) return '';
+  const lower = text.toLowerCase(); let pos = -1;
+  for(const t of terms){ const i = lower.indexOf(t); if(i >= 0 && (pos < 0 || i < pos)) pos = i; }
+  if(pos < 0) pos = 0;
+  const start = Math.max(0, pos - 32);
+  let seg = esc(text.slice(start, start + 160));
+  if(start > 0) seg = '…' + seg;
+  if(start + 160 < text.length) seg = seg + '…';
+  return searchMark(seg, terms);
+}
+function computeSearch(q){
+  const terms = searchParse(q); if(!terms.length) return [];
+  const out = [];
+  for(const n of notes){
+    if(n.archived) continue;                            /* stored away — not in search */
+    const rec = searchCached(n);
+    const nameL = (n.name || '').toLowerCase();
+    const hay = nameL + '\n' + rec.lower;
+    if(!terms.every(t => hay.indexOf(t) >= 0)) continue;
+    const sec = secById(n.sectionId); if(!sec || sec.archived) continue;
+    const nameHit = terms.some(t => nameL.indexOf(t) >= 0);
+    out.push({
+      noteId: n.id, secId: sec.id, tab: sec.name || 'Untitled tab', priv: !!sec.local,
+      name: n.sheet ? (sec.name || 'Untitled page') : (n.name || 'Untitled label'),
+      isSheet: !!n.sheet,
+      snippet: searchSnippet(rec.text || n.name || '', terms),
+      score: searchCount(hay, terms) + (nameHit ? 60 : 0), updated: n.updated || 0
+    });
+  }
+  for(const s of sections){
+    if(s.kind === 'sheet' || s.archived) continue;      /* sheet page covered by backing note; archived = in storage */
+    const nl = (s.name || '').toLowerCase();
+    if(terms.every(t => nl.indexOf(t) >= 0)) out.push({ secId: s.id, tab: s.name || 'Untitled tab', name: s.name || 'Untitled tab', isTab: true, priv: !!s.local, snippet: '', score: 70, updated: s.created || 0 });
+  }
+  out.sort((a, b) => b.score - a.score || b.updated - a.updated);
+  return out;
+}
+/* cluster the flat results by tab, then order the groups (and the items inside each) per the chosen sort */
+function searchGroup(all, mode){
+  const map = new Map();
+  for(const r of all){
+    let g = map.get(r.secId);
+    if(!g){ g = { secId: r.secId, tab: r.tab, priv: r.priv, items: [], best: -Infinity, latest: -Infinity }; map.set(r.secId, g); }
+    g.items.push(r);
+    if(r.score > g.best) g.best = r.score;
+    if((r.updated || 0) > g.latest) g.latest = r.updated || 0;
+  }
+  const groups = [...map.values()];
+  const byScore = (a, b) => b.score - a.score || (b.updated || 0) - (a.updated || 0);
+  const byEdited = (a, b) => (b.updated || 0) - (a.updated || 0);
+  const byName = (a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' });
+  const itemCmp = mode === 'edited' ? byEdited : (mode === 'name' ? byName : byScore);
+  groups.forEach(g => g.items.sort(itemCmp));
+  const nameCmp = (a, b) => (a.tab || '').localeCompare(b.tab || '', undefined, { sensitivity: 'base' });
+  const groupCmp = mode === 'edited' ? ((a, b) => b.latest - a.latest)
+    : (mode === 'tab' || mode === 'name') ? nameCmp
+    : ((a, b) => b.best - a.best || b.latest - a.latest);
+  groups.sort(groupCmp);
+  return groups;
+}
+function searchLayout(){
+  const q = searchQ;
+  if(!q){
+    searchItems = []; searchActive = -1; searchInfo.style.display = 'none';
+    searchResults.innerHTML = '<div id="searchEmpty">Type a word or two to find the tabs, labels, and pages that contain them.<br>Tip: use several words to require all of them, or put "quotes" around an exact phrase.</div>';
+    return;
+  }
+  const terms = searchParse(q);
+  const groups = searchGroup(searchAll, searchSortMode);
+  searchItems = [];
+  let html = '';
+  for(const g of groups){
+    const head = '<div class="sgroup-head" data-sec="' + esc(g.secId) + '" title="Open this tab"><span class="sgroup-name">' + (g.priv ? '🔒 ' : '') + esc(g.tab) + '</span><span class="sgroup-count">' + g.items.length + '</span></div>';
+    let items = '';
+    for(const r of g.items){
+      const i = searchItems.length; searchItems.push(r);
+      const kind = r.isTab ? 'tab' : (r.isSheet ? 'page' : 'label');
+      items += '<div class="sres' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
+        '<div class="sres-top"><span class="sres-name">' + searchMark(esc(r.name), terms) + '</span><span class="sres-kind">' + kind + '</span></div>' +
+        (r.snippet ? '<div class="sres-snip">' + r.snippet + '</div>' : '') + '</div>';
+    }
+    html += '<div class="sgroup">' + head + '<div class="sgroup-items">' + items + '</div></div>';
+  }
+  searchActive = searchItems.length ? 0 : -1;
+  searchResults.innerHTML = searchItems.length ? html : '<div id="searchEmpty">No matches.</div>';
+  const nMatch = searchItems.length, nTab = groups.length;
+  searchInfo.style.display = 'flex';
+  searchCountEl.textContent = nMatch
+    ? (nMatch + (searchAll.length > nMatch ? '+' : '') + ' match' + (nMatch > 1 ? 'es' : '') + ' in ' + nTab + ' tab' + (nTab > 1 ? 's' : ''))
+    : 'No matches';
+}
+function runSearch(){
+  searchQ = searchInput.value.trim();
+  searchAll = computeSearch(searchQ).slice(0, 100);
+  searchLayout();
+}
+function searchMoveSel(d){
+  if(!searchItems.length) return;
+  searchActive = (searchActive + d + searchItems.length) % searchItems.length;
+  searchResults.querySelectorAll('.sres').forEach(el => el.classList.toggle('active', +el.dataset.i === searchActive));
+  const cur = searchResults.querySelector('.sres[data-i="' + searchActive + '"]');
+  if(cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });
+}
+function searchOpen(prefill){
+  closeMenu(); $('#menuDrop').hidden = true; afHide();
+  searchOverlay.hidden = false;
+  searchSort.value = searchSortMode;
+  if(prefill != null) searchInput.value = prefill;
+  runSearch();
+  searchInput.focus(); searchInput.select();
+}
+function searchClose(){ searchOverlay.hidden = true; }
+function searchGo(r){
+  if(!r) return;
+  searchHL = searchParse(searchQ);
+  searchClose();
+  if(r.noteId){ const t = '#note/' + r.noteId; if(location.hash === t) route(); else location.hash = t; }
+  else if(r.secId){ gotoSection(r.secId); }
+}
+/* after opening a page from a search result, reveal the first match */
+function searchHighlightFirst(terms){
+  if(!terms || !terms.length || editorView.hidden) return;
+  const walker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT, null);
+  let node;
+  while((node = walker.nextNode())){
+    const low = node.data.toLowerCase(); let pos = -1, term = '';
+    for(const t of terms){ const i = low.indexOf(t); if(i >= 0 && (pos < 0 || i < pos)){ pos = i; term = t; } }
+    if(pos >= 0){
+      const r = document.createRange(); r.setStart(node, pos); r.setEnd(node, pos + term.length);
+      try{
+        if(window.Highlight && window.CSS && CSS.highlights){
+          CSS.highlights.set('sfind', new Highlight(r));
+          clearTimeout(sfindT); sfindT = setTimeout(() => { try{ CSS.highlights.delete('sfind'); }catch(e){} }, 2800);
+        }
+      }catch(e){}
+      const el = node.parentElement || page;
+      try{ el.scrollIntoView({ block: 'center' }); }catch(e){ try{ el.scrollIntoView(); }catch(_){} }
+      return;
+    }
+  }
+}
+searchInput.addEventListener('input', () => { clearTimeout(searchT); searchT = setTimeout(runSearch, 90); });
+searchInput.addEventListener('keydown', e => {
+  if(e.key === 'ArrowDown'){ e.preventDefault(); searchMoveSel(1); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); searchMoveSel(-1); }
+  else if(e.key === 'Enter'){ e.preventDefault(); searchGo(searchItems[searchActive]); }
+  else if(e.key === 'Escape'){ e.preventDefault(); searchClose(); }
+});
+searchResults.addEventListener('mousedown', e => {
+  const it = e.target.closest('.sres');
+  if(it){ e.preventDefault(); searchGo(searchItems[+it.dataset.i]); return; }
+  const head = e.target.closest('.sgroup-head');
+  if(head && head.dataset.sec){ e.preventDefault(); searchHL = searchParse(searchQ); searchClose(); gotoSection(head.dataset.sec); }
+});
+searchSort.addEventListener('change', () => { searchSortMode = searchSort.value; saveSearchSort(); searchLayout(); });
+searchOverlay.addEventListener('mousedown', e => { if(e.target === searchOverlay) searchClose(); });
+$('#searchBtn').addEventListener('click', () => searchOpen());
+$('#searchClose').addEventListener('click', searchClose);
 document.addEventListener('visibilitychange', () => { if(document.hidden) flushSave(); });
 
 /* ============================================================
@@ -2355,6 +2934,8 @@ addEventListener('mouseup', () => {
 
 /* Tab moves between table cells; Tab in the last cell adds a row */
 page.addEventListener('keydown', e => {
+  if(!acPop.hidden && afKeydown(e)) return;          /* auto-fill: navigate / accept / dismiss the suggestion list */
+  if(e.key === 'Tab' && !e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && afTryExpand()){ e.preventDefault(); return; }  /* Tab expands a shortcut */
   if((e.key === 'Backspace' || e.key === 'Delete') && selectedImg){
     e.preventDefault();
     selectedImg.remove(); deselectImg(); queueSave(); updateEmpty();
@@ -2787,7 +3368,9 @@ addEventListener('mousedown', e => {
   if(dm && !dm.contains(e.target)) $('#menuDrop').hidden = true;
 });
 addEventListener('keydown', e => {
-  if(e.key === 'Escape'){ closeMenu(); hidePicker(); if(!overlay.hidden) hideModal(); if(!lightbox.hidden) closeLightbox(); deselectImg(); clearSel(); }
+  if(e.key === 'Escape'){ closeMenu(); hidePicker(); if(!overlay.hidden) hideModal(); if(!lightbox.hidden) closeLightbox(); if(!searchOverlay.hidden) searchClose(); deselectImg(); clearSel(); }
+  /* ⌘F / Ctrl-F searches the whole notebook (better than the browser's find, which only sees the open page) */
+  if((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'f'){ e.preventDefault(); searchOpen(); }
   if((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 's'){
     e.preventDefault();
     flushSave();
@@ -3705,7 +4288,32 @@ async function initSync(){
     setPageNum, getPageNum: () => pageNumOf(cur),
     numCount: () => document.querySelectorAll('#pageDeco .pcnum').length,
     numAlign: () => { const n = document.querySelector('#pageDeco .pcnum'); return n ? (n.style.textAlign || '') : null; },
-    wordHtml, paginateForPrint
+    wordHtml, paginateForPrint,
+    afState: () => ({ ac: AF.ac, sn: AF.sn, snips: AF.snips.map(s => ({ c: s.c, t: s.t })) }),
+    afSetEnabled: (ac, sn) => { AF.ac = ac; AF.sn = sn; afSave(); },
+    afSetSnips: arr => { AF.snips = arr.map(s => ({ c: String(s.c), t: String(s.t) })); afSave(); },
+    afBuildDict, afSuggest, afDictSize: () => acScores.size,
+    afPopOpen: () => !acPop.hidden, afPopItems: () => acItems.slice(), afTryExpand, afExpandTrigger,
+    searchQuery: q => computeSearch(q).map(r => ({ tab: r.tab, name: r.name, kind: r.isTab ? 'tab' : (r.isSheet ? 'page' : 'label'), noteId: r.noteId || null, secId: r.secId, score: r.score })),
+    searchGroups: (q, m) => searchGroup(computeSearch(q).slice(0, 100), m || searchSortMode).map(g => ({ tab: g.tab, count: g.items.length, items: g.items.map(i => i.name) })),
+    searchSetSort: m => { searchSortMode = m; if(searchSort) searchSort.value = m; saveSearchSort(); if(!searchOverlay.hidden) searchLayout(); },
+    searchGetSort: () => searchSortMode,
+    searchOpen, searchClose, runSearch, searchOpenState: () => !searchOverlay.hidden,
+    searchInputEl: () => searchInput, searchResultCount: () => searchItems.length,
+    searchOrder: () => searchItems.map(r => r.name),
+    storageCount, openStorage,
+    visibleTabs: () => sections.filter(s => !s.archived).map(s => s.name),
+    storageState: () => ({
+      tabs: archivedSecs().map(s => ({ id: s.id, name: s.name, priv: !!s.local })),
+      labels: archivedLabels().map(n => ({ id: n.id, name: n.name, from: (secById(n.sectionId) || {}).name || null, priv: isLocalNote(n) })),
+      count: storageCount()
+    }),
+    archiveSecById: id => { const s = secById(id); if(s) archiveSection(s); },
+    restoreSecById: id => { const s = secById(id); if(s) restoreSection(s); },
+    archiveNoteById: id => { const n = notes.find(x => x.id === id); if(n) archiveNote(n); },
+    restoreNoteById: id => { const n = notes.find(x => x.id === id); if(n) restoreNote(n); },
+    secIdByName: nm => (sections.find(s => s.name === nm) || {}).id || null,
+    noteIdByName: nm => (notes.find(n => n.name === nm) || {}).id || null
   };
 })();
 </script>

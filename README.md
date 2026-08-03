@@ -18,7 +18,7 @@ optionally sync between two people through GitHub.
 3. Click the named label to open its page and start writing.
 4. Use the toolbar to format; everything saves automatically.
 
-The little version tag lives at the bottom of the **Menu** (currently **v36**).
+The little version tag lives at the bottom of the **Menu** (currently **v40**).
 
 ## Multiple notebooks (name follows the file)
 
@@ -54,6 +54,21 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 - **Private pages (only you):** right‑click a tab → **“Make private (only you)”**. A private page shows in **bold italic with a 🔒**. It **still backs up to GitHub**, but into *your own* area of the repo (`private/<your‑id>.json`) that **other people’s IdeaSink never reads** — so it’s preserved and available if you reinstall, yet your wife’s IdeaSink won’t show it. Turning a page private (or moving a label into one) also removes its labels from the shared copy so others stop seeing them. Right‑click → “Make shared” to put it back in the shared notebook.
 - **Password‑protect private pages:** Menu → **“Private tab password…”**. With a password set, your private file is **encrypted** before upload, so even someone who can open the repo on GitHub (like the other person sharing it) can’t read it — only someone with the password can. The password is remembered on this device and re‑entered on a new one; there’s no recovery if you forget it, so keep it safe. (Without a password, a private page is still hidden from other people’s app, but the file’s contents would be readable by anyone who browses the repo directly — set a password if that matters.)
 
+### Storage (archive old tabs & labels — without deleting)
+- **Put things away, don’t lose them:** right‑click a tab → **“Move to storage 🗄️”**, or right‑click a label → **“Move to storage 🗄️”** (you can also send a whole multi‑selection of labels at once). The item disappears from the tab bar / sheet but is fully kept.
+- **The storage symbol:** a small **🗄️ archive button** sits to the right of the tabs, with a count badge when something’s inside. Click it to open storage.
+- **Restore or delete:** the storage panel lists your stored **Tabs** and **Labels** (each label shows which tab it came from). **Restore** puts it back — a label returns to its original tab — or **Delete** removes it for good (that one asks you to confirm).
+- **Nothing is really gone:** stored items are still saved and **synced/backed up** exactly like normal — and **private ones stay private** (kept in your own area, hidden from the other person). They just don’t clutter your tabs, and they’re kept out of Search until you restore them.
+- One tab always stays out of storage, so your notebook is never empty.
+
+### Search (find which tab or page has your words)
+- **Where:** the **“Search”** button at the top‑right, or **⌘F / Ctrl‑F** from anywhere (it replaces the browser’s own find, which would only see the page you’re currently looking at).
+- **What it covers:** every tab name, every label (its name *and* its page text), and every writing page — across the whole notebook at once, including your private tabs. Each result tells you **which tab** and **which label or page** the words are in.
+- **Words or phrases:** type one word, or several to require **all** of them (e.g. `budget offsite` finds pages that contain both). Put **"quotes"** around text to match that **exact phrase** (e.g. `"next quarter"`).
+- **Grouped by tab:** results are clustered under each tab’s name, with a count, so you can see at a glance which tabs contain your words (the top line says e.g. “4 matches in 3 tabs”). Click a tab heading to jump straight to that tab.
+- **Sort the results:** a small **Sort** control in the search bar reorders them — **Best match** (default), **Recently edited**, **Tab name (A–Z)**, or **Name (A–Z)**. Your choice is remembered.
+- **Jump to it:** click a result — or use **↑ / ↓** and **Enter** — to open that page, with the **first match highlighted** so you can see it right away. Each result shows a short preview with your words highlighted.
+
 ### Writing (the editor)
 - **Fonts:** 10 choices (Arial is the default) — Menu also lets you set the label font separately.
 - **Size** and **line spacing** (Single … Double) — line spacing applies to the paragraphs you select.
@@ -66,6 +81,9 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 - **Hyperlinks:** select text → right‑click → Add hyperlink (⌘/Ctrl‑click a link to open it).
 - **Undo / Redo:** the ↶ ↷ buttons, or ⌘Z / ⌘⇧Z.
 - **Paste matches your page:** pasted text takes on the page’s font instead of the copied font (bold, italic, lists, and links are kept).
+- **Text auto-fill** (Menu → **“Text auto-fill…”**): two optional writing helpers, both on by default.
+  - **Word suggestions as you type:** once you’ve typed a couple of letters, a small list pops up with likely words — drawn from what you’ve already written in this notebook, plus common English words. Press **Tab** or **Enter** to accept the highlighted one (↑/↓ to pick another), or just keep typing to ignore it. It learns your own words as you go.
+  - **Your own shortcuts:** define short codes that expand to longer text — e.g. `sig` → your sign‑off, `addr` → your address. Type the code then **space** (or **Tab**) and it becomes the full text; shortcuts can be multi‑line. Add, edit, or delete them in the same dialog. Both helpers can be switched off there, and everything you set is kept on this device.
 
 ### Your name & comments (great with live sync)
 - **Menu → “Your name…”** sets the name shown on your comments (and to the other person while live sync is on).
@@ -176,4 +194,4 @@ org. (Ask if you want those steps.)
 - Use the **same browser** on a given computer, or your notes will look missing (each browser keeps its own copy). Sync or a restored backup brings them together.
 - Keep only one copy of `IdeaSink.html` in your folder to avoid opening an old version by mistake; the Menu shows the version number so you can confirm.
 
-*IdeaSink v36*
+*IdeaSink v40*
