@@ -372,11 +372,12 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="labelFontBtn">Label font…</button>
         <hr>
         <button id="syncBtn">Live sync (GitHub)…</button>
+        <button id="privPassBtn">Private tab password…</button>
         <hr>
         <button id="autoBackupBtn">Automatic backup…</button>
         <button id="exportBtn">Back up notes…</button>
         <button id="importBtn">Restore backup…</button>
-        <div class="ver">IdeaSink v34</div>
+        <div class="ver">IdeaSink v36</div>
       </div>
     </div>
   </header>
@@ -474,7 +475,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v34';
+const APP_VERSION = 'v36';
 /* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
    copy is its own separate notebook: own name in the tab + header, own local storage,
    own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
@@ -786,12 +787,18 @@ function moveNotes(ids, destId){
   for(const id of ids){
     const n = notes.find(x => x.id === id);
     const wasShared = SYNC.on && noteSha[id] && !isLocalNote(n);   /* had a shared copy in the repo */
+    const wasPriv = isLocalNote(n);
     n.sectionId = destId;
     n.order = base++;
-    if(dest.local && wasShared){                                   /* moved into a private page → remove the shared copy + detach */
+    if(dest.local && wasShared){                                   /* shared → private: remove the shared copy + detach + re-id */
       tombstone('notes', id); delNotes.add(id); dirtyNotes.delete(id);
       const oldId = n.id; n.id = uid(); n.updated = Date.now();
       delete noteSha[oldId]; persist(n); unpersist(oldId, true);
+      privDirty = true;
+    }else if(dest.local){                                          /* into a private page */
+      privDirty = true; persist(n);
+    }else if(wasPriv){                                             /* private → shared: drop from private, add to shared */
+      privTombstone('notes', id); n.updated = Date.now(); privDirty = true; persist(n);
     }else{
       persist(n);
     }
@@ -837,8 +844,8 @@ function renderTabs(){
     const t = document.createElement('div');
     t.className = 'ptab' + (curSec && s.id === curSec.id ? ' active' : '') + (s.local ? ' local' : '');
     t.dataset.sid = s.id;
-    t.textContent = (s.kind === 'sheet' ? '▤ ' : '') + (s.local ? '🔒 ' : '') + s.name;   /* ▤ = single page, 🔒 = local (this device only) */
-    t.title = s.name + (s.kind === 'sheet' ? ' (single page)' : '') + (s.local ? ' — local, this device only (not shared)' : '');
+    t.textContent = (s.kind === 'sheet' ? '▤ ' : '') + (s.local ? '🔒 ' : '') + s.name;   /* ▤ = single page, 🔒 = private (only you) */
+    t.title = s.name + (s.kind === 'sheet' ? ' (single page)' : '') + (s.local ? ' — private (synced to your own area; others don’t see it)' : '');
     t.draggable = true;
     if(s.color) t.style.setProperty('--lc', s.color);
     tabrow.appendChild(t);
@@ -936,7 +943,7 @@ tabrow.addEventListener('contextmenu', e => {
     }},
     'sep',
     { label: s.kind === 'sheet' ? 'Turn into a labels sheet' : 'Turn into a single page', onclick: () => convertSection(s) },
-    { label: s.local ? 'Make shared (sync with GitHub)' : 'Make local (this device only)', onclick: () => toggleLocal(s) },
+    { label: s.local ? 'Make shared (everyone sees it)' : 'Make private (only you)', onclick: () => toggleLocal(s) },
     { label: 'Rename page…', onclick: () => renamePageDialog(s) },
     { label: 'Delete page…', cls: 'mi-danger', onclick: () => confirmDeletePage(s) }
   ]);
@@ -948,26 +955,28 @@ function toggleLocal(s){
       s.local = true; s.updated = Date.now();
       inSec.forEach(n => {
         dirtyNotes.delete(n.id);
-        if(SYNC.on && noteSha[n.id]){          /* it was shared → remove it from the repo + re-id the local copy so it's fully detached */
+        if(SYNC.on && noteSha[n.id]){          /* it was shared → remove the shared copy + re-id so it's fully detached */
           tombstone('notes', n.id); delNotes.add(n.id);
           const oldId = n.id; n.id = uid(); n.updated = Date.now();
-          delete noteSha[oldId]; persist(n); unpersist(oldId, true);
+          delete noteSha[oldId]; unpersist(oldId, true);
         }
+        persist(n);   /* now on a private page → goes to your private file */
       });
-      dirtyIndex = true; persistSec(s);
+      dirtyIndex = true; privDirty = true; persistSec(s);
       if(SYNC.on) schedulePush();
       renderSheet();
-      toast('“' + s.name + '” is now local — it stays on this device');
+      toast('“' + s.name + '” is now private — only you can see it' + (PRIVPASS ? '' : (SYNC.on ? '' : '')));
     };
     if(SYNC.on && inSec.some(n => noteSha[n.id])){
-      showModal({ title: 'Make “' + s.name + '” local?',
-        body: '<p>Its labels will stop syncing and be <b>removed from the shared copy</b> (others will no longer see them). Your copy stays on this device.</p>',
-        buttons: [{ label: 'Cancel' }, { label: 'Make local', cls: 'primary', onclick: apply }] });
+      showModal({ title: 'Make “' + s.name + '” private?',
+        body: '<p>Its labels move to <b>your private area</b> in the repo — still backed up, but other people’s IdeaSink won’t show them (they’re removed from the shared copy). Set a password in Menu → “Private tab password…” to encrypt them.</p>',
+        buttons: [{ label: 'Cancel' }, { label: 'Make private', cls: 'primary', onclick: apply }] });
     }else apply();
   }else{
     s.local = false; s.updated = Date.now(); persistSec(s);
-    notes.filter(n => n.sectionId === s.id).forEach(n => { n.updated = Date.now(); dirtyNotes.add(n.id); persist(n); });
-    dirtyIndex = true;
+    notes.filter(n => n.sectionId === s.id).forEach(n => { privTombstone('notes', n.id); n.updated = Date.now(); dirtyNotes.add(n.id); persist(n); });
+    privTombstone('secs', s.id);
+    dirtyIndex = true; privDirty = true;
     if(SYNC.on) schedulePush();
     renderSheet();
     toast('“' + s.name + '” is now shared with your repo');
@@ -996,11 +1005,11 @@ function confirmDeletePage(s){
     buttons: [
       { label: 'Cancel' },
       { label: 'Delete page', cls: 'danger', onclick: () => {
-        const local = !!s.local;
-        notes.filter(n => n.sectionId === s.id).forEach(n => { if(local){ unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } });
+        const priv = !!s.local;
+        notes.filter(n => n.sectionId === s.id).forEach(n => { if(priv){ privTombstone('notes', n.id); unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } });
         notes = notes.filter(n => n.sectionId !== s.id);
         sections = sections.filter(x => x.id !== s.id);
-        if(local){ unpersistSec(s.id, true); } else { tombstone('secs', s.id); unpersistSec(s.id); }
+        if(priv){ privTombstone('secs', s.id); unpersistSec(s.id, true); privDirty = true; if(SYNC.on) schedulePush(); } else { tombstone('secs', s.id); unpersistSec(s.id); }
         if(!sections.length){
           sections = [{ id: uid(), name: 'Page 1', color: '', order: 0, created: Date.now() }];
           persistSec(sections[0]);
@@ -1176,7 +1185,7 @@ function confirmDelete(n){
     body: '<p>The label and everything written on its page will be removed. This can’t be undone.</p>',
     buttons: [
       { label: 'Cancel' },
-      { label: 'Delete', cls: 'danger', onclick: () => { const local = isLocalNote(n); notes = notes.filter(x => x.id !== n.id); if(local){ unpersist(n.id, true); } else { tombstone('notes', n.id); unpersist(n.id); } renderSheet(); } }
+      { label: 'Delete', cls: 'danger', onclick: () => { const priv = isLocalNote(n); notes = notes.filter(x => x.id !== n.id); if(priv){ privTombstone('notes', n.id); unpersist(n.id, true); privDirty = true; if(SYNC.on) schedulePush(); } else { tombstone('notes', n.id); unpersist(n.id); } renderSheet(); } }
     ]
   });
 }
@@ -1537,7 +1546,11 @@ function openNoteInEditor(n, mode){
   updateEmpty();
   savedTag.textContent = '';
   showMode(mode);
-  { const vm = (n.view != null ? n.view : VIEWDEF); viewSel.value = (vm === 'letter' || vm === 'a4') ? vm : ''; applyView(viewSel.value); }
+  { const vm = (n.view != null ? n.view : VIEWDEF); const rv = (vm === 'letter' || vm === 'a4') ? vm : '';
+    /* if this page shows Pages only by inheriting the default, make that its own view so
+       page numbers (which key off note.view) and PDF/Word export stay consistent */
+    if(n.view == null && rv){ n.view = rv; persist(n); }
+    viewSel.value = rv; applyView(rv); }
   scrollTo(0, 0);
   page.focus({ preventScroll: true });
 }
@@ -3067,7 +3080,7 @@ $('#printBtnEd').addEventListener('click', () => { if(cur){ flushSave(); exportP
 const SYNCKEY = 'ideasink-sync' + WSSUFFIX, TOMBKEY = 'ideasink-tomb' + WSSUFFIX;
 const SYNC = (() => {
   const def = { on: false, name: '', userId: '', repo: '', path: 'ideasink-data.json',
-                index: 'index.json', dir: 'notes/', presDir: 'presence/',
+                index: 'index.json', dir: 'notes/', presDir: 'presence/', privDir: 'private/',
                 presencePath: 'ideasink-presence.json', branch: 'main', token: '' };
   let s; try{ s = Object.assign(def, JSON.parse(localStorage.getItem(SYNCKEY) || '{}')); }catch(e){ s = def; }
   if(!s.userId) s.userId = uid();
@@ -3087,6 +3100,16 @@ const noteSha = {};                       /* note id -> GitHub blob sha */
 const dirtyNotes = new Set();             /* labels changed locally, awaiting push */
 const delNotes = new Set();               /* labels deleted locally, file to remove */
 let dirtyIndex = false;                    /* sections/tombstones changed → rewrite index */
+/* PRIVATE tabs: synced to your OWN file private/<userId>.json (never read by other users),
+   optionally encrypted with a passphrase. s.local flag = "private" (kept for back-compat). */
+const HAS_CRYPTO = !!(window.crypto && crypto.subtle);
+let privSha = null, privDirty = false, privLocked = false;
+const PRIVTOMBKEY = 'ideasink-privtomb' + WSSUFFIX, PRIVPASSKEY = 'ideasink-privpass' + WSSUFFIX;
+const PRIVTOMB = (() => { try{ return Object.assign({ notes:{}, secs:{} }, JSON.parse(localStorage.getItem(PRIVTOMBKEY) || '{}')); }catch(e){ return { notes:{}, secs:{} }; } })();
+function savePrivTomb(){ try{ localStorage.setItem(PRIVTOMBKEY, JSON.stringify(PRIVTOMB)); }catch(e){} }
+function privTombstone(kind, id){ PRIVTOMB[kind][id] = Date.now(); savePrivTomb(); }
+let PRIVPASS = ''; try{ PRIVPASS = localStorage.getItem(PRIVPASSKEY) || ''; }catch(e){}
+function setPrivPass(p){ PRIVPASS = p || ''; try{ if(PRIVPASS) localStorage.setItem(PRIVPASSKEY, PRIVPASS); else localStorage.removeItem(PRIVPASSKEY); }catch(e){} }
 /* size watch — GitHub allows up to 100 MB PER FILE, so now the only risk is a single
    label stuffed with images. Warn on the largest label; show total in the dot tooltip. */
 let syncBytes = 0, sizeDismissed = false, wasNear = false;
@@ -3115,9 +3138,9 @@ $('#sizeWarnX') && $('#sizeWarnX').addEventListener('click', () => { sizeDismiss
 /* record what changed locally so the next push only touches those files */
 function syncTouch(kind, id){
   if(!(syncReady && SYNC.on && !applyingRemote)) return;
-  if(kind === 'note' && id){ const n = notes.find(x => x.id === id); if(n && isLocalNote(n)) return; dirtyNotes.add(id); }
+  if(kind === 'note' && id){ const n = notes.find(x => x.id === id); if(n && isLocalNote(n)){ privDirty = true; schedulePush(); return; } dirtyNotes.add(id); }
   else if(kind === 'del' && id){ delNotes.add(id); dirtyNotes.delete(id); dirtyIndex = true; }
-  else if(kind === 'sec'){ if(id && typeof id === 'object' && id.local) return; dirtyIndex = true; }
+  else if(kind === 'sec'){ if(id && typeof id === 'object' && id.local){ privDirty = true; schedulePush(); return; } dirtyIndex = true; }
   schedulePush();
 }
 
@@ -3222,6 +3245,83 @@ function pruneTomb(){
 function makeIndex(){     /* the shared index: tabs + tombstones only (labels are separate files) */
   pruneTomb();
   return { app: 'IdeaSink', v: 4, savedAt: Date.now(), sections: sections.filter(s => !s.local), tomb: TOMB };
+}
+
+/* ============================================================
+   PRIVATE tabs — synced to your own file private/<userId>.json, which no other
+   user's IdeaSink ever reads, and optionally AES-encrypted with a passphrase.
+   ============================================================ */
+function bytesToB64(u8){ let bin = ''; const CH = 0x8000; for(let i = 0; i < u8.length; i += CH) bin += String.fromCharCode.apply(null, u8.subarray(i, i + CH)); return btoa(bin); }
+function b64ToBytes(b64){ const bin = atob((b64 || '').replace(/\s/g, '')); const u8 = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return u8; }
+async function deriveAesKey(pass, salt){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 150000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function encPrivate(obj, pass){
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveAesKey(pass, salt);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(obj)));
+  return JSON.stringify({ enc: 1, v: 1, salt: bytesToB64(salt), iv: bytesToB64(iv), ct: bytesToB64(new Uint8Array(ct)) });
+}
+async function decPrivate(text, pass){
+  const o = JSON.parse(text);
+  if(!o || !o.enc) return o;                       /* stored as plain JSON */
+  if(!pass || !HAS_CRYPTO) throw new Error('locked');
+  const key = await deriveAesKey(pass, b64ToBytes(o.salt));
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToBytes(o.iv) }, key, b64ToBytes(o.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function privEmpty(){ return !sections.some(s => s.local) && !Object.keys(PRIVTOMB.notes).length && !Object.keys(PRIVTOMB.secs).length; }
+function makePrivate(){
+  const secs = sections.filter(s => s.local);
+  const ids = new Set(secs.map(s => s.id));
+  return { app: 'IdeaSink', v: 1, owner: SYNC.userId, savedAt: Date.now(), sections: secs, notes: notes.filter(n => ids.has(n.sectionId)), tomb: PRIVTOMB };
+}
+function mergePrivate(obj){
+  const rt = obj.tomb || { notes:{}, secs:{} };
+  for(const k of ['notes', 'secs']){ for(const id in (rt[k] || {})){ if((rt[k][id] || 0) > (PRIVTOMB[k][id] || 0)) PRIVTOMB[k][id] = rt[k][id]; } }
+  const sById = new Map(sections.map(s => [s.id, s]));
+  for(const rs of (obj.sections || [])){
+    rs.local = true;
+    const ls = sById.get(rs.id);
+    if(!ls){ if((PRIVTOMB.secs[rs.id] || 0) >= (rs.updated || rs.created || 0)) continue; sections.push(rs); sById.set(rs.id, rs); }
+    else if((rs.updated || 0) > (ls.updated || 0)) Object.assign(ls, rs);
+  }
+  const nById = new Map(notes.map(n => [n.id, n]));
+  for(const rn of (obj.notes || [])){
+    const ln = nById.get(rn.id);
+    if(!ln){ if((PRIVTOMB.notes[rn.id] || 0) >= (rn.updated || 0)) continue; notes.push(rn); nById.set(rn.id, rn); }
+    else if((rn.updated || 0) > (ln.updated || 0)) Object.assign(ln, rn);
+  }
+  notes = notes.filter(n => { const t = PRIVTOMB.notes[n.id] || 0; return !(t && t >= (n.updated || 0)); });
+  sections = sections.filter(s => { const t = PRIVTOMB.secs[s.id] || 0; return !(t && t >= (s.updated || s.created || 0)); });
+  sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+async function pushPrivate(){
+  const path = SYNC.privDir + SYNC.userId + '.json';
+  if(privEmpty()){ if(privSha){ try{ await ghDelete(path, privSha); }catch(e){} privSha = null; } return; }
+  const text = (PRIVPASS && HAS_CRYPTO) ? await encPrivate(makePrivate(), PRIVPASS) : JSON.stringify(makePrivate());
+  try{ const res = await ghPut(path, text, privSha, 'IdeaSink private · ' + (SYNC.name || '')); privSha = res.content.sha; }
+  catch(e){
+    if(!e.conflict) throw e;
+    await pullPrivate(true);
+    const t2 = (PRIVPASS && HAS_CRYPTO) ? await encPrivate(makePrivate(), PRIVPASS) : JSON.stringify(makePrivate());
+    const res2 = await ghPut(path, t2, privSha, 'IdeaSink private merge'); privSha = res2.content.sha;
+  }
+}
+async function pullPrivate(force){
+  const path = SYNC.privDir + SYNC.userId + '.json';
+  const f = await ghGetFile(path, force ? null : 'privfile');
+  if(f === NOT_MODIFIED) return;
+  if(!f){ privSha = null; return; }
+  privSha = f.sha;
+  let obj; try{ obj = await decPrivate(f.text, PRIVPASS); }catch(e){ if(!privLocked){ privLocked = true; toast('Private tabs are locked — Menu → “Private tab password…” to unlock'); } return; }
+  privLocked = false;
+  applyingRemote = true;
+  mergePrivate(obj);
+  notes.forEach(persist); sections.forEach(persistSec); savePrivTomb();
+  applyingRemote = false;
+  refreshAfterSync();
 }
 /* merge just sections + tombstones from a remote index; marks dirtyIndex when we're ahead */
 function mergeSecTomb(idx){
@@ -3409,11 +3509,12 @@ async function doPush(){
     }
     for(const id of delIds){ await deleteNote(id); delNotes.delete(id); }
     if(dirtyIndex || indexSha === null){ await putIndex(); dirtyIndex = false; }
+    if(privDirty){ await pushPrivate(); privDirty = false; }        /* your own private tabs → private/<userId>.json */
     updateSizeWatch();
     setSyncStatus('ok');
   }catch(e){ setSyncStatus('err', e.message); }
   pushing = false;
-  if(wantPush || dirtyNotes.size || delNotes.size || dirtyIndex) schedulePush();
+  if(wantPush || dirtyNotes.size || delNotes.size || dirtyIndex || privDirty) schedulePush();
 }
 
 /* ---- presence: one tiny file per person (presence/<userId>.json) so many people
@@ -3464,7 +3565,7 @@ async function pullPresence(){
 /* ---- timers ---- */
 function startSyncTimers(){
   stopSyncTimers();
-  syncTimer = setInterval(() => { pullMerge().catch(e => setSyncStatus('err', e.message)); pullPresence(); }, 12000);
+  syncTimer = setInterval(() => { pullMerge().catch(e => setSyncStatus('err', e.message)); pullPresence(); pullPrivate().catch(() => {}); }, 12000);
   beatTimer = setInterval(pushPresence, 25000);
 }
 function stopSyncTimers(){ clearInterval(syncTimer); clearInterval(beatTimer); syncTimer = beatTimer = null; }
@@ -3483,9 +3584,12 @@ async function connectSync(){
          write everything out as per-label files + an index */
       const legacy = await ghGetFile(SYNC.path).catch(() => null);
       if(legacy){ try{ const d = JSON.parse(legacy.text); applyingRemote = true; mergeRemote(d); notes.forEach(persist); sections.forEach(persistSec); saveTomb(); applyingRemote = false; }catch(e){ applyingRemote = false; } }
-      notes.forEach(n => dirtyNotes.add(n.id)); dirtyIndex = true;
+      notes.forEach(n => { if(!isLocalNote(n)) dirtyNotes.add(n.id); }); dirtyIndex = true;
       await doPush();
     }
+    await pullPrivate(true);                     /* pull my own private tabs (if any on the server) */
+    if(sections.some(s => s.local)) privDirty = true;   /* upload any device-only private tabs so they're preserved */
+    if(privDirty) await pushPrivate(), privDirty = false;
     await pushPresence();
     startSyncTimers();
     setSyncStatus('ok');
@@ -3497,12 +3601,38 @@ function disconnectSync(){
   const path = SYNC.presDir + SYNC.userId + '.json', sha = myPresSha;
   SYNC.on = false; saveSync(); stopSyncTimers();
   for(const id in presState) delete presState[id];
+  privSha = null; privDirty = false; privLocked = false;
   setSyncStatus(); renderPresence(); syncBytes = 0; const el = $('#sizeWarn'); if(el) el.hidden = true;
   if(sha){ ghDelete(path, sha, 'presence out').catch(() => {}); }   /* best-effort: drop my heartbeat file */
 }
 
 /* ---- setup dialog ---- */
 $('#syncBtn').addEventListener('click', () => { $('#menuDrop').hidden = true; openSyncDialog(); });
+$('#privPassBtn').addEventListener('click', () => {
+  $('#menuDrop').hidden = true;
+  const has = !!PRIVPASS, locked = privLocked;
+  const F = 'width:100%;padding:8px 10px;border:1px solid #d5d0c2;border-radius:8px;font:inherit;margin:6px 0 8px';
+  showModal({
+    title: locked ? 'Unlock private tabs' : 'Private tab password',
+    body: '<p style="color:#57523f;margin:0 0 6px">A password <b>encrypts your private tabs</b> before they’re uploaded, so no one else with repo access can read them — not even the other person sharing it. It’s remembered on this device; you re-enter it on a new device, and there’s no recovery if forgotten.' + (HAS_CRYPTO ? '' : ' <b>(Encryption isn’t available in this browser, so this won’t protect the file here.)</b>') + '</p>' +
+      '<input id="ppInput" type="password" autocomplete="new-password" placeholder="' + (locked ? 'Enter your password' : has ? 'New password (blank = keep current)' : 'Set a password') + '" style="' + F + '">',
+    buttons: [{ label: 'Cancel' }]
+      .concat((has && !locked) ? [{ label: 'Remove', onclick: () => { setPrivPass(''); privDirty = true; if(SYNC.on) schedulePush(); toast('Password removed — private tabs stored unencrypted'); } }] : [])
+      .concat([{ label: locked ? 'Unlock' : 'Save', cls: 'primary', onclick: () => {
+        const v = ($('#ppInput') && $('#ppInput').value) || '';
+        if(locked){
+          if(!v){ toast('Enter your password'); return; }
+          setPrivPass(v); privLocked = false;
+          if(SYNC.on) pullPrivate(true).then(() => { toast(privLocked ? 'That password didn’t work' : 'Unlocked'); renderSheet(); });
+          return;
+        }
+        if(!v && !has){ toast('Enter a password'); return; }
+        if(v) setPrivPass(v);
+        privDirty = true; if(SYNC.on) schedulePush();
+        toast(HAS_CRYPTO ? 'Private tabs are now password-protected' : 'Saved (encryption unavailable here)');
+      }}])
+  });
+});
 function openSyncDialog(){
   const F = 'width:100%;padding:8px 10px;border:1px solid #d5d0c2;border-radius:8px;font:inherit;margin:3px 0 8px';
   const body =
@@ -3558,6 +3688,9 @@ async function initSync(){
     connectSync, pullMerge, pullPresence, doPush, pushPresence, ghGetFile, ghListDir,
     sizeBanner, updateSizeWatch, notebookBytes, getSyncBytes: () => syncBytes,
     noteSha, dirtyNotes, delNotes, pruneTomb, presState, etags,
+    makePrivate, pushPrivate, pullPrivate, mergePrivate, PRIVTOMB, encPrivate, decPrivate,
+    setPrivPass: p => setPrivPass(p), getPrivPass: () => PRIVPASS,
+    privState: () => ({ privSha, privDirty, privLocked }),
     configSync: o => { Object.assign(SYNC, o); saveSync(); },
     setSyncOn: v => { SYNC.on = v; },
     state: () => ({ dataRev, backedRev, abLast, AB: JSON.parse(JSON.stringify(AB)) }),

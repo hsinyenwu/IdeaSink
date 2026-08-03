@@ -18,7 +18,7 @@ optionally sync between two people through GitHub.
 3. Click the named label to open its page and start writing.
 4. Use the toolbar to format; everything saves automatically.
 
-The little version tag lives at the bottom of the **Menu** (currently **v34**).
+The little version tag lives at the bottom of the **Menu** (currently **v36**).
 
 ## Multiple notebooks (name follows the file)
 
@@ -48,10 +48,11 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 ### Main pages (the tabs on top)
 - Each tab is a separate **main page** with its own labels — keep different topics apart.
 - **Two kinds of page:** a **sheet of labels** (the usual) or a **single writing page** (marked ▤) that opens straight into one page.
-- Right‑click a tab to switch its type, recolor, rename, make it **local**, or delete it; drag tabs to reorder.
+- Right‑click a tab to switch its type, recolor, rename, make it **private**, or delete it; drag tabs to reorder.
 - Tabs **wrap onto a second row** when one row fills up.
 - **Move labels between pages:** drag a label (or a multi‑selection) onto a tab, or right‑click → “Move to …”.
-- **Local (private) pages:** right‑click a tab → **“Make local (this device only)”**. A local page shows in **bold italic with a 🔒** and **never syncs to GitHub** — it stays only on this computer, even while your other tabs sync with your wife. Turning a page local (or moving a label into one) removes its labels from the shared repo so others no longer see them, while your copy stays put. Right‑click → “Make shared” to start syncing it again. (This only matters when Live sync is on; the tab uses Arial like the rest.)
+- **Private pages (only you):** right‑click a tab → **“Make private (only you)”**. A private page shows in **bold italic with a 🔒**. It **still backs up to GitHub**, but into *your own* area of the repo (`private/<your‑id>.json`) that **other people’s IdeaSink never reads** — so it’s preserved and available if you reinstall, yet your wife’s IdeaSink won’t show it. Turning a page private (or moving a label into one) also removes its labels from the shared copy so others stop seeing them. Right‑click → “Make shared” to put it back in the shared notebook.
+- **Password‑protect private pages:** Menu → **“Private tab password…”**. With a password set, your private file is **encrypted** before upload, so even someone who can open the repo on GitHub (like the other person sharing it) can’t read it — only someone with the password can. The password is remembered on this device and re‑entered on a new one; there’s no recovery if you forget it, so keep it safe. (Without a password, a private page is still hidden from other people’s app, but the file’s contents would be readable by anyone who browses the repo directly — set a password if that matters.)
 
 ### Writing (the editor)
 - **Fonts:** 10 choices (Arial is the default) — Menu also lets you set the label font separately.
@@ -175,4 +176,4 @@ org. (Ask if you want those steps.)
 - Use the **same browser** on a given computer, or your notes will look missing (each browser keeps its own copy). Sync or a restored backup brings them together.
 - Keep only one copy of `IdeaSink.html` in your folder to avoid opening an old version by mistake; the Menu shows the version number so you can confirm.
 
-*IdeaSink v34*
+*IdeaSink v36*
