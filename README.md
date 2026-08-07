@@ -7,7 +7,7 @@ optionally sync between two people through GitHub.
 
 - **One file, no install:** `IdeaSink.html` — double‑click to open in any modern browser.
 - **Works on Mac and Windows** (Chrome or Edge recommended; Safari works too).
-- **Your notes stay yours:** saved locally in your browser; nothing goes to any server unless you turn on GitHub sync.
+- **Your notes stay yours:** saved locally in your browser; nothing goes to any server unless you turn on GitHub sync. (Because they live *in the browser*, pick a backup folder early — see “Saving & backups”.)
 
 ---
 
@@ -17,8 +17,9 @@ optionally sync between two people through GitHub.
 2. Click a blank label, type a name, press **Enter**.
 3. Click the named label to open its page and start writing.
 4. Use the toolbar to format; everything saves automatically.
+5. **Set a backup folder** the first time you are asked — **Menu → “Automatic backup…” → “Choose backup folder…”**. Until you do, your notes exist only inside the browser and clearing browsing data would delete them. See “Saving & backups” below.
 
-The little version tag lives at the bottom of the **Menu** (currently **v40**).
+The little version tag lives at the bottom of the **Menu** (currently **v47**).
 
 ## Multiple notebooks (name follows the file)
 
@@ -81,9 +82,9 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 - **Hyperlinks:** select text → right‑click → Add hyperlink (⌘/Ctrl‑click a link to open it).
 - **Undo / Redo:** the ↶ ↷ buttons, or ⌘Z / ⌘⇧Z.
 - **Paste matches your page:** pasted text takes on the page’s font instead of the copied font (bold, italic, lists, and links are kept).
-- **Text auto-fill** (Menu → **“Text auto-fill…”**): two optional writing helpers, both on by default.
-  - **Word suggestions as you type:** once you’ve typed a couple of letters, a small list pops up with likely words — drawn from what you’ve already written in this notebook, plus common English words. Press **Tab** or **Enter** to accept the highlighted one (↑/↓ to pick another), or just keep typing to ignore it. It learns your own words as you go.
-  - **Your own shortcuts:** define short codes that expand to longer text — e.g. `sig` → your sign‑off, `addr` → your address. Type the code then **space** (or **Tab**) and it becomes the full text; shortcuts can be multi‑line. Add, edit, or delete them in the same dialog. Both helpers can be switched off there, and everything you set is kept on this device.
+- **Text auto-fill** (Menu → **“Text auto-fill…”**): two optional writing helpers.
+  - **Word suggestions as you type** — ***off* unless you turn it on** (the pop‑up list annoyed more than it helped, so it’s opt‑in as of v47). When enabled: after a couple of letters, a small list appears with likely words — drawn from what you’ve already written plus common English words. **Tab**/**Enter** accepts, ↑/↓ picks, typing on ignores.
+  - **Your own shortcuts** (on by default; they only act on codes *you* define): e.g. `sig` → your sign‑off. Type the code then **space** (or **Tab**) and it becomes the full text; shortcuts can be multi‑line. Add, edit, or delete them in the same dialog. Everything you set is kept on this device.
 
 ### Your name & comments (great with live sync)
 - **Menu → “Your name…”** sets the name shown on your comments (and to the other person while live sync is on).
@@ -99,7 +100,7 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 ### Images
 - **Paste, drag in, or insert** an image; it’s kept at full resolution.
 - **Pixel‑perfect display** (never blurrily upscaled); drag an image’s corner to resize.
-- **Double‑click** an image for a full‑size zoom view; right‑click for width presets, “View full size”, and **Image info** (shows exactly how many pixels a copy contains).
+- **Double‑click** an image for a full‑size zoom view — scrollable **edge to edge**, even when the image is far bigger than the window; right‑click for width presets, “View full size”, and **Image info** (shows exactly how many pixels a copy contains).
 
 ### PDFs (sharp)
 - **Drag a PDF file onto a page** and its pages are rendered as **high‑resolution, sharp** images — much crisper than copy‑pasting from a PDF viewer. For multi‑page PDFs you choose which pages to insert.
@@ -108,10 +109,37 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 - Insert an **n × n** table from a grid picker.
 - **Drag cell borders** to resize columns and rows; **right‑click** inside a table to add/delete rows and columns; **Tab** moves between cells.
 
+### Files on a page (attachments)
+- **Any file — code, Word docs, spreadsheets, zips — can live on a label's page.** Drag it onto the page (or use the **📎 attach** button) and it becomes a small **chip** showing its name and size, sitting right in the text where you put it.
+- **Stored inside the notebook**, so attachments ride along with **automatic backups and GitHub sync** — your wife's IdeaSink gets the files too, and they survive a browser wipe like everything else.
+- **Click a chip** to save a copy to Downloads. **Right‑click** it for *View as text* (great for code — shows the file in a scrollable monospace view), *File info*, or *Remove*.
+- **Search finds attachments by filename**, like everything else.
+- Sizes: files up to **80 MB** each can be attached; anything over ~10 MB gets a heads‑up that it will slow that label's sync. Word/print exports show a small **name marker** in place of each file (the file itself can't ride inside a printout).
+
+### Linked folder (a real folder on your computer, per page)
+- The **📁 folder** button in the editor links a page to a **real folder on your disk** — a live view of its contents opens right in IdeaSink: each file with a **⬇** button (save a copy to Downloads) and a **📎** button (store a copy into the notebook as a chip).
+- The link is **per‑computer** and IdeaSink itself never uploads or backs up the folder — it's a window onto your disk. That said, **if the folder you pick is a OneDrive/Dropbox folder, its files are of course already online** — kept there by that app, separately from IdeaSink's own protections (which cover your notes and 📎 attachments). The panel's wording reflects whichever case applies. (The other person sees only the folder's *name*; they can link their own copy on their machine, or ignore it.)
+- Chrome and Edge only (Safari doesn't allow folder access), and the browser re‑asks permission after a restart — that's the browser being careful, not a bug.
+- **Or paste a link instead.** If the folder is a **shared OneDrive folder** that's hard to find in the picker, choose **📁 → “Paste a link…”** and paste its share link. IdeaSink saves the link on the page — and since it's just a link, it **syncs to the other person too**, with an **Open online ↗** button for both of you. It then walks you through the one‑time OneDrive step (*open the link → “Add shortcut to My files”*) that makes the shared folder appear inside your local OneDrive folder, where you can pick it like any other. Dropbox and Google Drive links work the same way with their own “add/sync” options.
+- Why the extra step? Browsers can't read OneDrive over the web without signing in (Microsoft requires it) — the OneDrive app on your computer is what bridges cloud and disk. Once the shortcut exists, IdeaSink reads the local synced copy, and OneDrive keeps it current.
+- Rule of thumb: **attach** what should belong to the notebook and sync; **link** a folder you already keep on disk and just want at hand.
+
 ### Saving & backups
-- **Autosaves** continuously in your browser (per browser, so stick with one).
-- **Menu → “Back up notes”** downloads a single JSON file of everything; **“Restore backup”** loads one back (it *merges*, keeping the newer version of each label).
-- **Menu → “Automatic backup…”** writes a single `IdeaSink-autobackup.json` into a folder you choose (e.g. this IdeaSink folder) every few minutes, only when something changed. An optional checkbox also keeps one dated copy per day.
+
+**Please read this one.** IdeaSink autosaves everything into your browser’s own storage. That is what makes it instant and offline — but browser storage is *temporary by design*, and the browser will throw it away without asking you first. Clearing browsing data, choosing “cookies and site data” in a cleanup, resetting the browser, or a tune‑up utility tidying website storage will erase every note in one go. There is no undo and no copy in the cloud. Nothing carries across to a different browser, a different computer, or a new profile either.
+
+The fix takes about five seconds: pick a folder on your computer, and IdeaSink keeps a full copy there from then on, by itself.
+
+- **Menu → “Automatic backup…” → “Choose backup folder…”** — pick your IdeaSink folder (or any folder). IdeaSink writes a single `IdeaSink-autobackup.json` there every few minutes, only when something has actually changed. An optional checkbox also keeps one dated copy per day, giving you a short history to fall back on.
+- Until you have done that, IdeaSink says so: a yellow bar sits at the bottom of the window, and once a day it opens a short reminder explaining the risk. **Both disappear for good the moment a backup folder is set** — the bar is not a nag you have to live with, it is telling you your writing has nowhere safe to go. “Not now” hides the bar until you next open IdeaSink.
+- **Menu → “Back up notes”** downloads a single JSON file of everything, any time you want a copy in hand; **“Restore backup”** loads one back in (it *merges*, keeping the newer version of each label). The automatic backup file works with Restore too — one file brings back the whole notebook.
+- Safari and other browsers that can’t write straight into a folder get the download route instead: a backup file lands in **Downloads** on each interval, again only when something changed.
+- Live sync (below) puts a copy in GitHub, which is real protection against losing this computer — but it is not a substitute for a local folder, and IdeaSink will still ask for one.
+
+**Cloud folders (OneDrive, Dropbox, iCloud Drive) work — and are a good idea for backups.** A OneDrive folder looks like any normal folder to the browser; the OneDrive app quietly uploads whatever lands in it. So if you pick a OneDrive‑synced folder as the **backup folder** (or as a page’s **linked folder**), everything works as usual, and your backup additionally gets an off‑computer copy for free. Two things to know:
+
+- **Turn off “online‑only” for that folder.** OneDrive’s *Free up space* / Files On‑Demand (and iCloud’s *Optimize Storage*) can turn files into cloud placeholders; right‑click the folder → **“Always keep on this device”** so the browser always finds real files.
+- **The notebook itself doesn’t live in the folder.** Your *notes* live inside the browser on each computer — putting `IdeaSink.html` into OneDrive does **not** make the notebook follow you to another machine, and two people opening it from the same OneDrive do **not** share notes. On a new computer you’d open the file and use **Restore backup** (pointing at the autobackup JSON in that same cloud folder — convenient!), or turn on Live sync. For actually *sharing* with another person, GitHub Live sync remains the mechanism — a cloud drive can’t merge two people’s edits and would silently overwrite one of them.
 
 ### Live sync & sharing (optional — see setup below)
 - **Menu → “Live sync (GitHub)…”** stores the notebook in a GitHub repository you both use, so two people share the same notes (syncing every few seconds) and **see each other’s name** at the top while both are in it.
@@ -186,12 +214,41 @@ org. (Ask if you want those steps.)
 ---
 
 ## Where your data lives
-- Normally: inside your browser on this computer (per browser). Back up now and then.
-- With Automatic backup on: also as a JSON file in your chosen folder.
-- With Live sync on: also in your GitHub repository (private).
+- **By default: inside your browser on this computer**, and nowhere else. It is private and it is fast, but it is *not* safe storage — see the warning under “Saving & backups”. Clearing browsing data wipes it; each browser keeps its own separate copy.
+- **With Automatic backup on:** also as `IdeaSink-autobackup.json` in the folder you chose, rewritten whenever something changes. This is the copy that survives a browser wipe, so set it up on day one.
+- **With Live sync on:** also in your private GitHub repository, which additionally protects you if the computer itself is lost.
+- Nothing is ever sent anywhere unless you turn Live sync on yourself.
 
 ## Good to know
 - Use the **same browser** on a given computer, or your notes will look missing (each browser keeps its own copy). Sync or a restored backup brings them together.
+- **Never “clear browsing data” without a backup folder set.** That single click is the one thing that can lose a whole notebook.
 - Keep only one copy of `IdeaSink.html` in your folder to avoid opening an old version by mistake; the Menu shows the version number so you can confirm.
 
-*IdeaSink v40*
+---
+
+## License
+
+*(Also shown inside the app: **Menu → “About & license”**.)*
+
+Copyright © 2026 Larry Wu and Polly Hsu. All rights reserved.
+
+Permission is granted to use, copy, and modify this software **free of charge for
+personal, educational, and academic research purposes**, provided this notice and
+the copyright line above are kept with any copy you pass on.
+
+**Redistribution, commercial use, or inclusion in a commercial product or service
+requires written permission from the copyright holders.**
+
+The software is provided “as is”, without warranty of any kind, express or
+implied. The authors are not liable for any claim, damages, or data loss arising
+from its use. (Keep backups — see “Saving & backups” above.)
+
+### Third-party software
+IdeaSink embeds **Mozilla pdf.js 6.1.200**, used under the **Apache License 2.0**
+— © Mozilla Foundation. It is what renders imported PDF pages. Its full licence
+notice travels inside `IdeaSink.html` itself, so the requirement is satisfied by
+the file as shipped; the licence text is at
+<http://www.apache.org/licenses/LICENSE-2.0>. Nothing else third-party is
+included — no fonts, no CDNs, no analytics.
+
+*IdeaSink v47*

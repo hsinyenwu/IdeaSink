@@ -1,4 +1,16 @@
 <!doctype html>
+<!--
+  IdeaSink — Copyright (c) 2026 Larry Wu and Polly Hsu. All rights reserved.
+
+  Free to use, copy and modify for personal, educational and academic research
+  purposes, provided this notice is kept. Redistribution, commercial use, or
+  inclusion in a commercial product or service requires written permission from
+  the copyright holders. Provided "as is", without warranty of any kind.
+
+  Third-party: embeds Mozilla pdf.js 6.1.200 (c) Mozilla Foundation, used under
+  the Apache License 2.0 — http://www.apache.org/licenses/LICENSE-2.0
+  Its full licence notice is preserved inside the embedded pdf.js payload below.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -51,13 +63,27 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .syncdot.sync{background:#e0a800;animation:pulse 1s infinite}
 .syncdot.err{background:#c0392b}
 @keyframes pulse{50%{opacity:.35}}
-#sizeWarn{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:250;max-width:min(680px,94vw);
+#sizeWarn{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:250;width:max-content;max-width:min(680px,94vw);
   background:#fff7e0;border:1px solid #e6c34d;color:#5a4a12;border-radius:12px;padding:9px 13px;
   box-shadow:0 10px 34px rgba(60,54,38,.22);display:flex;gap:10px;align-items:center;font-size:13px;line-height:1.45}
 #sizeWarn.near{background:#fdece9;border-color:#e0a39c;color:#7a271c}
 #sizeWarn .sw-x{margin-left:auto;flex:none;border:0;background:transparent;font-size:17px;line-height:1;cursor:pointer;color:inherit;opacity:.7;padding:0 2px}
 #sizeWarn .sw-x:hover{opacity:1}
 #sizeWarn[hidden]{display:none}
+#sizeWarn.stacked{bottom:88px}
+/* "your notes only live in this browser" nudge — stays put until a backup folder exists */
+#protectWarn{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:110;width:max-content;max-width:min(760px,95vw);flex-wrap:wrap;
+  background:#fff3d6;border:1px solid #dfae35;color:#57420f;border-radius:12px;padding:10px 14px;
+  box-shadow:0 12px 38px rgba(60,54,38,.26);display:flex;gap:11px;align-items:center;font-size:13px;line-height:1.45}
+#protectWarn .pw-ico{flex:none;font-size:17px;line-height:1.2}
+#protectWarn .pw-text{flex:1 1 300px;min-width:200px}
+#protectWarn .pw-go{flex:none;border:1px solid #b98b18;background:#fff;color:#57420f;border-radius:8px;
+  padding:7px 12px;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+#protectWarn .pw-go:hover{background:#fffaef}
+#protectWarn .pw-later{flex:none;border:0;background:transparent;color:inherit;opacity:.6;cursor:pointer;
+  font:inherit;font-size:12.5px;padding:5px 2px;text-decoration:underline;white-space:nowrap}
+#protectWarn .pw-later:hover{opacity:1}
+#protectWarn[hidden]{display:none}
 .toolbar .presence{margin-left:auto;padding-right:6px}
 .toolbar .presence:not(:empty) + .saved{margin-left:8px}
 .dropdown{
@@ -290,6 +316,15 @@ body.sheet-embed .tabbar{position:static}
 .page a{color:var(--blue)}
 .page img{max-width:100%;height:auto;border-radius:2px}
 .page img.img-selected{outline:2px solid var(--blue);outline-offset:1px}
+/* attached-file chips — any file kept inside the notebook, shown in the text flow */
+.page a.fchip{display:inline-flex;align-items:center;gap:7px;max-width:100%;box-sizing:border-box;margin:2px 2px;
+  padding:5px 11px;border:1px solid #d9d3c2;border-radius:9px;background:#faf8f1;color:#3d3a2f;
+  text-decoration:none;font-size:12.5px;line-height:1.3;cursor:pointer;vertical-align:middle;user-select:none}
+.page a.fchip:hover{background:#f1eddd;border-color:#c8bfa5}
+.page a.fchip .fc-ico{font-size:15px;line-height:1}
+.page a.fchip .fc-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px}
+.page a.fchip .fc-size{color:#8a8577;font-size:11.5px;white-space:nowrap}
+#dirBtn.on{color:var(--blue)}
 .page .cmt{background:rgba(255,207,64,.30);border-bottom:1px dotted #cb9a00;border-radius:2px}
 .page .cmt.resolved{background:transparent;border-bottom:none}
 .page .cmark{cursor:pointer;font-size:11px;vertical-align:super;margin:0 1px 0 1px;user-select:none;line-height:0}
@@ -392,8 +427,10 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
 
 
 #lightbox{position:fixed;inset:0;z-index:250;background:rgba(25,22,16,.9);overflow:auto;cursor:zoom-out}
-#lightbox .lb-inner{min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:34px}
-#lightbox img{display:block;max-width:none;background:#fff;box-shadow:0 12px 60px rgba(0,0,0,.55)}
+/* width:max-content + margin:auto (not justify-content) — otherwise an image wider than the
+   window gets centered with its left edge pushed outside the scrollable area, unreachable */
+#lightbox .lb-inner{min-height:100%;min-width:100%;width:max-content;box-sizing:border-box;display:flex;padding:34px}
+#lightbox img{display:block;max-width:none;margin:auto;background:#fff;box-shadow:0 12px 60px rgba(0,0,0,.55)}
 #lightbox .lb-hint{
   position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
   color:#fff;opacity:.75;font-size:12.5px;pointer-events:none;white-space:nowrap;
@@ -435,7 +472,9 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="autoBackupBtn">Automatic backup…</button>
         <button id="exportBtn">Back up notes…</button>
         <button id="importBtn">Restore backup…</button>
-        <div class="ver">IdeaSink v40</div>
+        <hr>
+        <button id="aboutBtn">About &amp; license</button>
+        <div class="ver">IdeaSink v47</div>
       </div>
     </div>
   </header>
@@ -495,6 +534,12 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
     <button class="tb-btn" id="tblBtn" title="Insert table">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M3.5 14.5h17M9.5 4.5v15M15 4.5v15"/></svg>
     </button>
+    <button class="tb-btn" id="attachBtn" title="Attach a file to this page — any type (code, Word, whatever). Stored inside the notebook, so it syncs and backs up. Or just drag the file in.">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 11.3 12 20.5a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.9-2.9l8.5-8.5"/></svg>
+    </button>
+    <button class="tb-btn" id="dirBtn" title="Linked folder — connect a real folder on this computer to this page (per-computer; not synced or backed up)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 19a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4.6l2 2.8h8.4a2 2 0 0 1 2 2z"/></svg>
+    </button>
     <button class="tb-btn" id="cmtBtn" title="Comment on the selected text">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.5a2.5 2.5 0 0 1-2.5 2.5H8l-4 3.5V6a2.5 2.5 0 0 1 2.5-2.5h11A2.5 2.5 0 0 1 20 6Z"/></svg>
     </button>
@@ -539,12 +584,14 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
 </div>
 <div id="cmtPop" hidden></div>
 <div id="sizeWarn" hidden><span class="sw-text"></span><button class="sw-x" id="sizeWarnX" title="Dismiss">×</button></div>
+<div id="protectWarn" hidden><span class="pw-ico">⚠️</span><span class="pw-text"></span><button class="pw-go" id="protectGo" type="button">Choose folder…</button><button class="pw-later" id="protectLater" type="button">Not now</button></div>
 <div class="picker" id="tablePicker" hidden><div class="pgrid" id="pgrid"></div><div class="plabel" id="plabel">1 × 1</div></div>
 <div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
 <div id="imgHandle" hidden></div>
 <div id="selBar" hidden><span id="selCount"></span><button id="selMoveBtn">Move to page ▾</button><button id="selClearBtn" title="Clear selection (Esc)">✕</button></div>
 <div id="lightbox" hidden><div class="lb-inner"><img id="lbImg" alt=""></div><div class="lb-hint">Pixel-perfect view — click anywhere or press Esc to close</div></div>
 <input type="file" id="filePick" accept="image/*,.pdf,application/pdf" multiple hidden>
+<input type="file" id="attachPick" multiple hidden>
 <input type="file" id="importPick" accept=".json,application/json" hidden>
 <script>
 'use strict';
@@ -553,7 +600,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v40';
+const APP_VERSION = 'v47';
 /* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
    copy is its own separate notebook: own name in the tab + header, own local storage,
    own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
@@ -1479,6 +1526,25 @@ $('#helpBtn').addEventListener('click', () => {
   $('#menuDrop').hidden = true;
   showModal({ title: 'How IdeaSink works', body: HELP_HTML, buttons: [{ label: 'Got it', cls: 'primary' }] });
 });
+
+/* ---------------- about & license ---------------- */
+const ABOUT_HTML =
+  '<p><b>IdeaSink ' + APP_VERSION + '</b> — a label-sheet notebook that lives in a single file on your own computer. ' +
+  'No account, no server, and it works with the internet switched off.</p>' +
+  '<p style="margin-top:13px"><b>Copyright © 2026 Larry Wu and Polly Hsu.</b> All rights reserved.</p>' +
+  '<p>You may use, copy and modify IdeaSink free of charge for <b>personal, educational and academic research</b> ' +
+  'purposes, as long as this notice stays with any copy you pass on. Redistribution, commercial use, or including it ' +
+  'in a commercial product or service requires written permission from the copyright holders.</p>' +
+  '<p>Provided “as is”, without warranty of any kind. The authors are not liable for any claim, damages, or lost ' +
+  'notes arising from its use — please keep a backup folder set.</p>' +
+  '<p style="margin-top:13px"><b>Third-party software</b></p>' +
+  '<p>Includes <b>Mozilla pdf.js 6.1.200</b> © Mozilla Foundation, used under the Apache License 2.0 ' +
+  '(<a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener" style="color:var(--blue)">apache.org/licenses/LICENSE-2.0</a>) ' +
+  '— it is what renders imported PDF pages. Nothing else from outside is included: no fonts, no web services, no analytics.</p>';
+$('#aboutBtn').addEventListener('click', () => {
+  $('#menuDrop').hidden = true;
+  showModal({ title: 'About IdeaSink', body: ABOUT_HTML, buttons: [{ label: 'Close', cls: 'primary' }] });
+});
 /* label font — used by label names, page tabs, and the page sticker */
 const LFKEY = 'ideasink-labelfont' + WSSUFFIX;
 const HAND_DEFAULT = "Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', Arimo, sans-serif";
@@ -1667,6 +1733,7 @@ function openAutoBackupDialog(){
       AB.on = false; saveAB();
       clearInterval(abTimer); abTimer = null;
       toast('Auto-backup off');
+      updateProtectBanner();
     }}] : []).concat([
       { label: AB.on ? 'Save' : 'Save & turn on', cls: 'primary', onclick: () => {
         const inp = document.getElementById('abMins');
@@ -1676,7 +1743,7 @@ function openAutoBackupDialog(){
         if(fsOK){
           AB.mode = 'folder';
           if(pendingDir){ dirHandle = pendingDir; settingSet('backupDir', dirHandle); }
-          if(!dirHandle){ AB.on = false; saveAB(); toast('Choose a backup folder first'); return; }
+          if(!dirHandle){ AB.on = false; saveAB(); toast('Choose a backup folder first'); updateProtectBanner(); return; }
         }else{
           AB.mode = 'download';
         }
@@ -1684,6 +1751,7 @@ function openAutoBackupDialog(){
         startABTimer();
         doAutoBackup(true);
         toast('Auto-backup on — every ' + AB.mins + ' min');
+        updateProtectBanner();
       }}
     ])
   });
@@ -1699,6 +1767,106 @@ function openAutoBackupDialog(){
     });
   }
 }
+
+/* ---------------- “where does my writing actually live?” ----------------
+   Notes are kept in this browser's own storage. That is fast, private and works
+   offline — but it is NOT a safe home. Clearing browsing data, a browser reset,
+   a cleanup tool that tidies “website data”, or a fresh profile all wipe it, and
+   nothing carries over to another computer. So until a backup folder is set up we
+   keep a standing warning on screen and nudge once a day. Both vanish the moment
+   automatic backup has somewhere real to write. */
+const PROTKEY = 'ideasink-protect' + WSSUFFIX;
+let NONAG = false;   /* ?nonag=1 turns the whole nudge off — used by the test suite */
+try{ NONAG = new URLSearchParams(location.search).get('nonag') === '1'; }catch(e){}
+const PROT = (() => {
+  try{ return Object.assign({ nagAt: 0 }, JSON.parse(localStorage.getItem(PROTKEY) || '{}')); }
+  catch(e){ return { nagAt: 0 }; }
+})();
+function saveProt(){ try{ localStorage.setItem(PROTKEY, JSON.stringify(PROT)); }catch(e){} }
+let protHushed = false;          /* “Not now” quiets it until the next launch — never longer */
+const NAG_GAP = 20 * 3600 * 1000;
+const fsPickOK = () => !!window.showDirectoryPicker;
+function syncIsOn(){ try{ return !!(SYNC && SYNC.on); }catch(e){ return false; } }
+/* protected = an automatic copy lands somewhere outside this browser */
+function dataProtected(){
+  if(!AB.on) return false;
+  if(AB.mode === 'folder') return !!dirHandle;
+  return AB.mode === 'download';     /* browsers with no folder access (Safari) */
+}
+function protectMsg(){
+  if(!fsPickOK()) return 'Everything you write is stored inside this browser only — clearing browsing data would erase it. Turn on automatic backup and IdeaSink will save a copy to your Downloads folder.';
+  if(AB.on && AB.mode === 'folder' && !dirHandle) return 'IdeaSink can’t reach your backup folder any more, so nothing is being saved outside the browser. Choose the folder again to start backing up.';
+  if(syncIsOn()) return 'Your notes sync to GitHub, but there’s no copy on this computer — the only local copy is inside the browser, and clearing browsing data would wipe it. Pick a folder and IdeaSink will keep a backup file there too.';
+  return 'Your notes live inside this browser only. Clearing browsing data — or resetting the browser — would erase all of them. Pick a folder on your computer and IdeaSink will keep a backup file there, updated by itself.';
+}
+function restackWarn(){
+  const p = document.getElementById('protectWarn'), s = document.getElementById('sizeWarn');
+  if(s) s.classList.toggle('stacked', !!(p && !p.hidden));
+}
+function updateProtectBanner(){
+  const el = document.getElementById('protectWarn'); if(!el) return;
+  const show = !NONAG && !protHushed && !dataProtected();
+  if(show){
+    const t = el.querySelector('.pw-text'); if(t) t.textContent = protectMsg();
+    const go = el.querySelector('.pw-go'); if(go) go.textContent = fsPickOK() ? 'Choose folder…' : 'Turn on backups';
+  }
+  el.hidden = !show;
+  restackWarn();
+}
+/* one click from the warning straight to a working backup — no dialog to wade through */
+async function protectSetup(){
+  if(!fsPickOK()){                    /* Safari & friends: Downloads is the only automatic option */
+    AB.mode = 'download'; AB.on = true; if(!AB.mins) AB.mins = 2;
+    saveAB(); startABTimer(); doAutoBackup(true);
+    toast('Automatic backup on — a copy lands in Downloads');
+    updateProtectBanner();
+    return true;
+  }
+  let h = null;
+  try{ h = await showDirectoryPicker({ id: 'ideasink-backups', mode: 'readwrite', startIn: 'desktop' }); }catch(e){}
+  if(!h){ updateProtectBanner(); return false; }   /* they backed out of the picker */
+  dirHandle = h;
+  await settingSet('backupDir', h);
+  AB.mode = 'folder'; AB.on = true; if(!AB.mins) AB.mins = 2;
+  saveAB(); startABTimer();
+  await doAutoBackup(true);
+  toast('Backups on — saving into “' + h.name + '”');
+  updateProtectBanner();
+  return true;
+}
+function protectNagModal(){
+  const canPick = fsPickOK();
+  showModal({
+    title: 'Give your notes a home on this computer',
+    body:
+      '<p style="margin:0 0 9px">Everything you write in ' + WSNAME + ' is currently stored <b>inside this browser</b>. It’s saved, and it works offline — but browser storage is not a safe long-term home:</p>' +
+      '<ul style="margin:0 0 10px 18px;padding:0;color:#57523f;line-height:1.55">' +
+      '<li>Clearing browsing data (“cookies and site data”) erases every note.</li>' +
+      '<li>So does resetting the browser, or a cleanup tool tidying website storage.</li>' +
+      '<li>Nothing carries over to another browser, computer, or new profile.</li></ul>' +
+      (canPick
+        ? '<p style="margin:0;color:#57523f">Choose a folder once and IdeaSink keeps <b>IdeaSink-autobackup.json</b> in it, rewriting it every couple of minutes whenever something has changed. That single file is a complete copy — Menu → Import brings it all back.</p>'
+        : '<p style="margin:0;color:#57523f">This browser can’t write straight into a folder, so IdeaSink will drop a backup file into your <b>Downloads</b> folder instead, only when something has changed.</p>'),
+    buttons: [
+      { label: 'Not now' },
+      { label: canPick ? 'Choose folder…' : 'Turn on backups', cls: 'primary', onclick: () => { protectSetup(); } }
+    ]
+  });
+}
+function maybeNagProtect(){
+  if(NONAG || dataProtected()) return false;
+  const now = Date.now();
+  if(PROT.nagAt && now - PROT.nagAt < NAG_GAP) return false;   /* at most once a day */
+  if(!overlay.hidden) return false;                            /* never interrupt another dialog */
+  PROT.nagAt = now; saveProt();
+  protectNagModal();
+  return true;
+}
+document.getElementById('protectGo').addEventListener('click', () => { protectSetup(); });
+document.getElementById('protectLater').addEventListener('click', () => {
+  protHushed = true; updateProtectBanner();
+  toast('Reminder hidden until you reopen ' + WSNAME);
+});
 </script>
 <script>
 'use strict';
@@ -1735,6 +1903,7 @@ function openNoteInEditor(n, mode){
        page numbers (which key off note.view) and PDF/Word export stay consistent */
     if(n.view == null && rv){ n.view = rv; persist(n); }
     viewSel.value = rv; applyView(rv); }
+  dirBtnRefresh();
   scrollTo(0, 0);
   page.focus({ preventScroll: true });
   if(searchHL){ const hl = searchHL; searchHL = null; setTimeout(() => searchHighlightFirst(hl), 40); }
@@ -1823,15 +1992,19 @@ page.addEventListener('input', () => { queueSave(); updateEmpty(); schedulePagin
    so the browser's own undo/redo keeps working, and paginating stays consistent.
    ============================================================ */
 const AFKEY = 'ideasink-autofill' + WSSUFFIX;
-let AF = { ac: true, sn: true, snips: [] };
+let AF = { ac: false, sn: true, snips: [], v2: true };   /* word suggestions are OPT-IN — off until turned on */
 function afLoad(){
   try{
     const j = JSON.parse(localStorage.getItem(AFKEY) || 'null');
     if(j && typeof j === 'object'){
-      AF.ac = j.ac !== false; AF.sn = j.sn !== false;
+      /* v47: suggestions became opt-in. Old saves (no v2 flag) reset once to off;
+         from then on only an explicit choice in the dialog turns them on. */
+      AF.ac = j.v2 ? j.ac === true : false;
+      AF.sn = j.sn !== false;
       AF.snips = Array.isArray(j.snips) ? j.snips.filter(s => s && s.c && s.t).map(s => ({ c: String(s.c), t: String(s.t) })) : [];
     }
   }catch(e){}
+  AF.v2 = true;
 }
 function afSave(){ try{ localStorage.setItem(AFKEY, JSON.stringify(AF)); }catch(e){} }
 afLoad();
@@ -1986,7 +2159,7 @@ function afDialog(){
   const F = 'width:100%;padding:8px 10px;border:1px solid #d5d0c2;border-radius:8px;font:inherit';
   const body =
     '<p style="color:#57523f;margin:0 0 8px">Two helpers while you’re writing on a page:</p>' +
-    '<label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="checkbox" id="afAc"' + (AF.ac ? ' checked' : '') + ' style="margin-top:3px"><span><b>Suggest words as I type</b><br><span style="color:#8a8577;font-size:12.5px">A little list pops up from words you’ve used (and common words). Press <b>Tab</b> or <b>Enter</b> to accept it, or just keep typing to ignore it.</span></span></label>' +
+    '<label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="checkbox" id="afAc"' + (AF.ac ? ' checked' : '') + ' style="margin-top:3px"><span><b>Suggest words as I type</b> <span style="color:#a49d8a;font-weight:400;font-size:12px">(off unless you turn it on)</span><br><span style="color:#8a8577;font-size:12.5px">A little list pops up from words you’ve used (and common words). Press <b>Tab</b> or <b>Enter</b> to accept it, or just keep typing to ignore it.</span></span></label>' +
     '<label style="display:flex;gap:8px;align-items:flex-start;margin:6px 0"><input type="checkbox" id="afSn"' + (AF.sn ? ' checked' : '') + ' style="margin-top:3px"><span><b>Expand my shortcuts</b><br><span style="color:#8a8577;font-size:12.5px">Type a short code then <b>space</b> (or <b>Tab</b>) and it becomes the full text.</span></span></label>' +
     '<div style="border-top:1px solid #e7e2d5;margin:10px 0 8px"></div>' +
     '<div style="font-weight:600;color:#4c483a;margin:0 0 6px">Your shortcuts</div>' +
@@ -2327,6 +2500,12 @@ function paginate(){
   page.style.minHeight = totalH + 'px';
   pageDeco.style.height = totalH + 'px';
   lastPagedH = totalH;
+  /* put the caret back where the eye left it (see the beforeinput note above) */
+  if(keepCaretY != null){
+    const r = caretViewRect();
+    if(r && Math.abs(r.top - keepCaretY) > 2) scrollBy(0, Math.round(r.top - keepCaretY));
+    keepCaretY = null;
+  }
   paginating = false;
 }
 if('ResizeObserver' in window){
@@ -2338,10 +2517,49 @@ if('ResizeObserver' in window){
   ro.observe(page);
 }
 addEventListener('resize', () => { if(PAGED.on) schedulePaginate(); });
-/* structural edits (undo/redo, delete, paste, Enter) act on clean content */
+/* structural edits (undo/redo, delete, paste, Enter) act on clean content.
+   v47: stripping EVERY spacer on every delete collapsed the document above the
+   caret for a frame — the browser then scrolled the caret back into view and the
+   pages visibly jumped around. Now only the spacers touching the edit point are
+   removed (the rest keep the layout steady), and for the rare full strips the
+   caret's on-screen position is restored after repagination. */
 const STRUCTURAL = /^(history|delete|insertParagraph|insertLineBreak|insertFromPaste|insertFromDrop)/;
+let keepCaretY = null;
+function caretViewRect(){
+  try{
+    const s = getSelection(); if(!s.rangeCount) return null;
+    const r = s.getRangeAt(0).cloneRange(); r.collapse(false);
+    let rect = r.getBoundingClientRect();
+    if(rect && (rect.top || rect.height)) return rect;
+    const el = s.anchorNode && (s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement);
+    return el ? el.getBoundingClientRect() : null;
+  }catch(e){ return null; }
+}
+function stripSpacersNear(){
+  const s = getSelection(); if(!s.rangeCount) return;
+  const range = s.getRangeAt(0);
+  const blockOf = n => { while(n && n !== page && n.parentNode !== page) n = n.parentNode; return (n === page) ? null : n; };
+  const kill = new Set();
+  for(const el of [blockOf(range.startContainer), blockOf(range.endContainer)]){
+    if(!el || el.nodeType !== 1) continue;
+    if(el.classList.contains('pg-space')) kill.add(el);
+    const p = el.previousElementSibling, nx = el.nextElementSibling;
+    if(p && p.classList.contains('pg-space')) kill.add(p);
+    if(nx && nx.classList.contains('pg-space')) kill.add(nx);
+  }
+  if(!range.collapsed){
+    page.querySelectorAll('.pg-space').forEach(sp => { try{ if(range.intersectsNode(sp)) kill.add(sp); }catch(e){} });
+  }
+  kill.forEach(sp => sp.remove());
+}
 page.addEventListener('beforeinput', e => {
-  if(PAGED.on && (!e.inputType || STRUCTURAL.test(e.inputType))) stripDecoration();
+  if(!PAGED.on) return;
+  const t = e.inputType || '';
+  if(t && !STRUCTURAL.test(t)) return;
+  const r = caretViewRect(); keepCaretY = r ? r.top : null;
+  if(!t || /^history/.test(t)) stripDecoration();   /* undo/redo can resurrect spacers — clean fully */
+  else stripSpacersNear();
+  schedulePaginate();
 });
 viewSel.addEventListener('change', () => {
   if(!cur){ viewSel.value = ''; return; }
@@ -2713,6 +2931,8 @@ linkBtn.addEventListener('click', () => {
   saveRange(); linkDialog(null);
 });
 page.addEventListener('click', e => {
+  const chip = e.target.closest('a.fchip');
+  if(chip){ e.preventDefault(); downloadChip(chip); return; }
   const a = e.target.closest('a');
   if(a){
     e.preventDefault();
@@ -2722,15 +2942,25 @@ page.addEventListener('click', e => {
 
 /* ---------------- editor context menu ---------------- */
 page.addEventListener('contextmenu', e => {
-  const a = e.target.closest('a');
+  const chip = e.target.closest('a.fchip');
+  const a = chip ? null : e.target.closest('a');
   const img = e.target.closest('img');
   const cell = e.target.closest('td,th');
   const s = getSelection();
   const hasSel = s.rangeCount && !s.isCollapsed && page.contains(s.anchorNode);
-  if(!a && !img && !cell && !hasSel) return;   /* plain right-click keeps the browser menu (paste, spelling) */
+  if(!chip && !a && !img && !cell && !hasSel) return;   /* plain right-click keeps the browser menu (paste, spelling) */
   e.preventDefault();
   saveRange();
   const items = [];
+  if(chip){
+    items.push({ label: 'Save a copy (download)', onclick: () => downloadChip(chip) });
+    if(isTexty(chip.dataset.fname, chip.dataset.ftype))
+      items.push({ label: 'View as text', onclick: () => viewChipText(chip) });
+    items.push(
+      { label: 'File info', onclick: () => fileInfoDialog(chip) },
+      { label: 'Remove file', cls: 'mi-danger', onclick: () => { chip.remove(); queueSave(); updateEmpty(); } }
+    );
+  }
   if(a){
     items.push(
       { label: 'Open link', onclick: () => window.open(a.href, '_blank') },
@@ -3080,6 +3310,311 @@ async function insertImageFile(f){
   }catch(err){ toast('Couldn’t read that image'); }
 }
 
+/* ---------------- file attachments — any file, kept inside the notebook ---------------- */
+const ATTACH_MAX = 80 * 1048576;    /* GitHub sync tops out near 100 MB per label — leave headroom */
+const ATTACH_WARN = 10 * 1048576;
+function fmtBytes(n){
+  if(!(n >= 0)) return '';
+  if(n < 1024) return Math.max(1, Math.round(n)) + ' B';
+  if(n < 1048576) return Math.max(1, Math.round(n / 1024)) + ' KB';
+  return (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB';
+}
+const TEXTY_EXT = new Set(['txt','md','markdown','csv','tsv','json','yml','yaml','toml','xml','html','htm','css',
+  'js','mjs','cjs','ts','tsx','jsx','py','r','rmd','sh','bash','zsh','sql','c','h','cpp','hpp','cc','java','rb',
+  'go','rs','swift','m','pl','tex','bib','log','ini','cfg','conf','fasta','fa','gb','gtf','gff','bed','sam','vcf']);
+const extOf = name => { const m = /\.([a-z0-9]+)$/i.exec(name || ''); return m ? m[1].toLowerCase() : ''; };
+function fileEmoji(name){
+  const x = extOf(name);
+  if(['doc','docx','rtf','odt','pages'].includes(x)) return '📄';
+  if(['xls','xlsx','xlsm','csv','tsv','numbers','ods'].includes(x)) return '📊';
+  if(['ppt','pptx','key','odp'].includes(x)) return '📽️';
+  if(['zip','gz','tgz','tar','7z','rar','dmg'].includes(x)) return '🗜️';
+  if(['mp3','wav','m4a','aac','flac'].includes(x)) return '🎵';
+  if(['mp4','mov','avi','mkv','webm'].includes(x)) return '🎬';
+  if(x === 'pdf') return '📕';
+  if(TEXTY_EXT.has(x)) return '🧾';
+  return '📎';
+}
+function isTexty(name, type){ return TEXTY_EXT.has(extOf(name)) || /^text\//.test(type || ''); }
+function fchipHtml(name, size, type, url){
+  return '<a class="fchip" contenteditable="false" href="' + url + '" download="' + esc(name) + '"' +
+    ' data-fname="' + esc(name) + '" data-fsize="' + (size || 0) + '" data-ftype="' + esc(type || '') + '" data-fdate="' + Date.now() + '">' +
+    '<span class="fc-ico">' + fileEmoji(name) + '</span><span class="fc-name">' + esc(name) + '</span>' +
+    '<span class="fc-size">' + fmtBytes(size || 0) + '</span></a>';
+}
+async function attachFile(f){
+  if(!f) return;
+  if(f.size > ATTACH_MAX){
+    toast('“' + f.name + '” is ' + fmtBytes(f.size) + ' — over the 80 MB limit for files kept inside the notebook');
+    return;
+  }
+  const url = await new Promise(res => {
+    const fr = new FileReader();
+    fr.onload = () => res(fr.result);
+    fr.onerror = () => res(null);
+    fr.readAsDataURL(f);
+  });
+  if(!url){ toast('Couldn’t read “' + f.name + '”'); return; }
+  page.focus({ preventScroll: true });
+  document.execCommand('insertHTML', false, fchipHtml(f.name, f.size, f.type, url) + '&nbsp;');
+  toast(f.size > ATTACH_WARN
+    ? 'Attached ' + f.name + ' (' + fmtBytes(f.size) + ') — files this big make the label slower to sync'
+    : 'Attached ' + f.name + ' — it’s stored in the notebook, so it syncs and backs up');
+  queueSave(); updateEmpty();
+}
+function downloadChip(chip){
+  const a = document.createElement('a');
+  a.href = chip.getAttribute('href'); a.download = chip.dataset.fname || 'file';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Saved a copy of ' + (chip.dataset.fname || 'the file') + ' to your Downloads');
+}
+async function chipText(chip){
+  const href = chip.getAttribute('href') || '';
+  try{ return await (await fetch(href)).text(); }
+  catch(e){
+    try{ return new TextDecoder().decode(Uint8Array.from(atob(href.split(',')[1] || ''), c => c.charCodeAt(0))); }
+    catch(_){ return null; }
+  }
+}
+async function viewChipText(chip){
+  let text = await chipText(chip);
+  if(text == null){ toast('Couldn’t decode this file as text'); return; }
+  if(text.length > 400000) text = text.slice(0, 400000) + '\n… (long file — view truncated; the stored copy is complete)';
+  showModal({
+    title: (chip.dataset.fname || 'File'),
+    body: '<pre style="max-height:52vh;overflow:auto;background:#f6f4ec;border:1px solid #e3ded0;border-radius:8px;padding:12px 14px;' +
+      'font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:break-word;margin:8px 0 0">' + esc(text) + '</pre>',
+    buttons: [{ label: 'Save a copy', onclick: () => downloadChip(chip) }, { label: 'Close', cls: 'primary' }]
+  });
+}
+function fileInfoDialog(chip){
+  const d = chip.dataset, when = d.fdate ? new Date(+d.fdate).toLocaleDateString() : '';
+  showModal({
+    title: 'File info',
+    body: '<p><b>' + esc(d.fname || '') + '</b></p>' +
+      '<p>Size: <b>' + fmtBytes(+d.fsize || 0) + '</b>' + (d.ftype ? ' · Type: ' + esc(d.ftype) : '') + (when ? ' · Added: ' + when : '') + '</p>' +
+      '<p style="color:#8a8577;font-size:12.5px">Kept inside the notebook — synced and backed up with this label. Click the chip any time to save a copy out. · IdeaSink ' + APP_VERSION + '</p>',
+    buttons: [{ label: 'OK', cls: 'primary' }]
+  });
+}
+const attachBtn = $('#attachBtn'), attachPick = $('#attachPick'), dirBtn = $('#dirBtn');
+attachBtn.addEventListener('click', () => { saveRange(); attachPick.click(); });
+attachPick.addEventListener('change', async () => {
+  const fs = [...attachPick.files]; attachPick.value = '';
+  page.focus({ preventScroll: true }); restoreRange();
+  for(const f of fs){
+    if(isPdfFile(f)) await importPdf(f);
+    else if(/^image\//.test(f.type)) await insertImageFile(f);
+    else await attachFile(f);
+  }
+});
+
+/* ---------------- linked folder — a real folder on THIS computer, per page ---------------- */
+const LDIRS = Object.create(null);       /* noteId → directory handle (runtime; persisted copy in settings) */
+async function getLabelDir(id){
+  if(LDIRS[id]) return LDIRS[id];
+  try{ const h = await settingGet('labelDir:' + id); if(h) LDIRS[id] = h; return h || null; }catch(e){ return null; }
+}
+async function ensureDirRead(h){
+  try{
+    if(!h.queryPermission) return true;                        /* simple objects in tests */
+    if(await h.queryPermission({ mode: 'read' }) === 'granted') return true;
+    return (await h.requestPermission({ mode: 'read' })) === 'granted';
+  }catch(e){ return false; }
+}
+function dirBtnRefresh(){
+  if(dirBtn) dirBtn.classList.toggle('on', !!(cur && (LDIRS[cur.id] || cur.folderName || cur.cloudUrl)));
+}
+async function pickLabelDir(){
+  if(!window.showDirectoryPicker){
+    toast('Linking a folder needs Chrome or Edge — Safari doesn’t allow it. (Attaching files works everywhere: drag them in or use 📎.)');
+    return;
+  }
+  let h = null;
+  try{ h = await showDirectoryPicker({ id: 'ideasink-labeldir', mode: 'read' }); }catch(e){}
+  if(!h || !cur) return;
+  LDIRS[cur.id] = h;
+  try{ settingSet('labelDir:' + cur.id, h); }catch(e){}
+  cur.folderName = h.name;
+  persist(cur);
+  dirBtnRefresh();
+  openLabelDirPanel();
+}
+function unlinkLabelDir(){
+  if(!cur) return;
+  delete LDIRS[cur.id];
+  try{ settingSet('labelDir:' + cur.id, null); }catch(e){}
+  delete cur.folderName;
+  persist(cur);
+  dirBtnRefresh();
+  toast('Folder link removed — the folder itself is untouched');
+}
+/* a pasted cloud link (OneDrive / Dropbox / Google Drive) — a plain URL, so unlike the
+   local folder handle it DOES sync to the other person with the note */
+function cloudNameFor(url){
+  const u = (url || '').toLowerCase();
+  if(u.includes('1drv.ms') || u.includes('onedrive')) return 'OneDrive folder';
+  if(u.includes('sharepoint')) return 'OneDrive/SharePoint folder';
+  if(u.includes('dropbox')) return 'Dropbox folder';
+  if(u.includes('drive.google')) return 'Google Drive folder';
+  return 'Cloud folder';
+}
+function cloudLinkDialog(prefUrl, prefName){
+  if(!cur) return;
+  const F = 'width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #d5d0c2;border-radius:8px;font:inherit;background:#fff;margin-top:5px';
+  const attr = v => String(v || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  showModal({
+    title: 'Paste a cloud folder link',
+    body: '<p>Paste the share link of a OneDrive (or Dropbox / Google Drive) folder. IdeaSink remembers it on this page — and because it’s just a link, it <b>syncs to the other person too</b>.</p>' +
+      '<label style="font-size:12.5px;color:#57523f">Folder link</label>' +
+      '<input id="cluIn" type="text" spellcheck="false" placeholder="https://1drv.ms/f/…" value="' + attr(prefUrl) + '" style="' + F + '">' +
+      '<label style="font-size:12.5px;color:#57523f;display:block;margin-top:9px">Name (optional)</label>' +
+      '<input id="clnIn" type="text" placeholder="e.g. Our shared papers" value="' + attr(prefName) + '" style="' + F + '">' +
+      '<p style="color:#8a8577;font-size:12.5px;margin-top:9px">Browsers can’t read OneDrive over the web without signing in, so the link itself opens in a tab — and a one-time OneDrive step (next screen) makes the folder appear on this computer so IdeaSink can read it like any local folder.</p>',
+    buttons: [
+      { label: 'Cancel' },
+      { label: 'Save link', cls: 'primary', onclick: () => {
+        const url = ($('#cluIn') ? $('#cluIn').value : '').trim();
+        const name0 = ($('#clnIn') ? $('#clnIn').value : '').trim();
+        if(!/^https?:\/\/\S+$/i.test(url)){
+          toast('That doesn’t look like a link — it should start with https://');
+          cloudLinkDialog(url, name0);          /* the wrapper already closed the dialog — reopen it with what was typed */
+          return;
+        }
+        const name = name0 || cloudNameFor(url);
+        cur.cloudUrl = url; cur.cloudName = name;
+        cur.updated = Date.now();          /* so the link wins LWW and reaches the other person */
+        persist(cur);
+        dirBtnRefresh();
+        toast('Link saved — it syncs with this page');
+        cloudGuideModal();
+      } }
+    ]
+  });
+}
+function cloudGuideModal(){
+  if(!cur || !cur.cloudUrl) return;
+  const isOD = /1drv\.ms|onedrive|sharepoint/i.test(cur.cloudUrl);
+  showModal({
+    title: '☁️ ' + esc(cur.cloudName || 'Cloud folder'),
+    body: '<p><a href="' + esc(cur.cloudUrl) + '" target="_blank" rel="noopener" id="cloudOpenA" style="color:var(--blue);word-break:break-all">' + esc(cur.cloudUrl) + '</a></p>' +
+      '<p>To let IdeaSink read the files, make the folder appear on this computer (one time):</p>' +
+      (isOD
+        ? '<ol style="margin:6px 0 4px 20px;line-height:1.7">' +
+          '<li><b>Open the link</b> and sign in to OneDrive as yourself.</li>' +
+          '<li>Click <b>“Add shortcut to My files”</b> in the OneDrive toolbar.</li>' +
+          '<li>The folder appears inside your local <b>OneDrive</b> folder and starts syncing (set it to “Always keep on this device”).</li>' +
+          '<li>Come back here and pick that folder.</li></ol>'
+        : '<ol style="margin:6px 0 4px 20px;line-height:1.7">' +
+          '<li><b>Open the link</b> and sign in to the service.</li>' +
+          '<li>Use its “add to my files / sync” option so the folder appears in the service’s local folder on this computer.</li>' +
+          '<li>Come back here and pick that folder.</li></ol>') +
+      '<p style="color:#8a8577;font-size:12.5px">Until then, the ☁️ button here simply opens the link in a tab — handy on any computer, and the other person sharing this notebook gets the same link automatically.</p>',
+    buttons: [
+      { label: 'Remove link', onclick: removeCloudLink },
+      { label: 'Open the link ↗', onclick: () => { try{ window.open(cur.cloudUrl, '_blank'); }catch(e){} } },
+      { label: 'Choose the synced folder…', cls: 'primary', onclick: pickLabelDir }
+    ]
+  });
+}
+function removeCloudLink(){
+  if(!cur) return;
+  delete cur.cloudUrl; delete cur.cloudName;
+  cur.updated = Date.now();
+  persist(cur);
+  dirBtnRefresh();
+  toast('Cloud link removed');
+}
+async function openLabelDirPanel(){
+  if(!cur) return;
+  const h = await getLabelDir(cur.id);
+  if(!h){
+    if(cur.cloudUrl){ cloudGuideModal(); return; }
+    if(cur.folderName){
+      showModal({ title: 'Linked folder',
+        body: '<p>This page is linked to a folder named “<b>' + esc(cur.folderName) + '</b>” on another computer. ' +
+          'The folder link itself is <b>per-computer</b> — IdeaSink never uploads the folder (if it’s a cloud folder, its own app keeps it online).</p><p>You can link a folder on this computer too, paste a cloud link instead, or remove the link.</p>',
+        buttons: [{ label: 'Remove link', onclick: unlinkLabelDir }, { label: 'Paste a link…', onclick: cloudLinkDialog }, { label: 'Choose folder…', cls: 'primary', onclick: pickLabelDir }] });
+    }else{
+      showModal({ title: 'Link a folder to this page',
+        body: '<p>Connect a folder, and its files show up here — for quick copies out, or for storing one into the notebook.</p>' +
+          '<ul style="margin:6px 0 4px 18px;line-height:1.65">' +
+          '<li><b>Choose folder…</b> picks a real folder on this computer — including a OneDrive/Dropbox folder that syncs here (its files stay online via that app; IdeaSink itself never uploads the folder).</li>' +
+          '<li><b>Paste a link…</b> saves a OneDrive/cloud share link on this page instead — useful when the shared folder is hard to find in the picker. The link syncs to the other person, and IdeaSink walks you through making it a real local folder.</li>' +
+          '<li>To keep a file <i>with</i> the notebook (synced &amp; backed up), use the 📎 attach button or drag it onto the page.</li></ul>',
+        buttons: [{ label: 'Cancel' }, { label: 'Paste a link…', onclick: cloudLinkDialog }, { label: 'Choose folder…', cls: 'primary', onclick: pickLabelDir }] });
+    }
+    return;
+  }
+  if(!await ensureDirRead(h)){
+    showModal({ title: 'Folder — ' + esc(h.name || ''),
+      body: '<p>The browser needs permission again to read “' + esc(h.name || '') + '” — it re-asks after a restart.</p>',
+      buttons: [{ label: 'Remove link', onclick: unlinkLabelDir }, { label: 'Cancel' }, { label: 'Try again', cls: 'primary', onclick: openLabelDirPanel }] });
+    return;
+  }
+  const rows = [];
+  let over = false;
+  try{
+    for await (const ent of h.values()){
+      if(rows.length >= 300){ over = true; break; }
+      if(ent.kind === 'file'){
+        let size = 0; try{ size = (await ent.getFile()).size; }catch(e){}
+        rows.push({ name: ent.name, dir: false, size, handle: ent });
+      }else rows.push({ name: ent.name, dir: true });
+    }
+  }catch(e){ toast('Couldn’t read the folder'); return; }
+  rows.sort((a, b) => (a.dir !== b.dir) ? (a.dir ? -1 : 1) : String(a.name).localeCompare(String(b.name)));
+  const rowBtn = 'border:1px solid #d5d0c2;background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;font:inherit;font-size:12px';
+  const cloudRow = cur.cloudUrl
+    ? '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:7px 11px;border:1px solid #d9e4f2;border-radius:9px;background:#f3f7fc;font-size:12.5px">' +
+      '<span>☁️</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>' + esc(cur.cloudName || 'Cloud folder') + '</b></span>' +
+      '<a href="' + esc(cur.cloudUrl) + '" target="_blank" rel="noopener" style="color:var(--blue);white-space:nowrap;text-decoration:none">Open online ↗</a></div>'
+    : '';
+  const intro = cur.cloudUrl
+    /* the picked folder is the synced copy of a cloud folder — the cloud app protects it, not IdeaSink */
+    ? 'A live view of the synced copy on this computer — <b>your cloud app (OneDrive/Dropbox) keeps these files online</b>; IdeaSink just reads them here. IdeaSink’s own backups &amp; GitHub sync cover your notes and 📎 attachments, not this folder. '
+    : 'A live view of a folder on this computer. IdeaSink itself doesn’t upload or back up this folder (your notes and 📎 attachments are what IdeaSink protects) — though if it sits inside OneDrive or Dropbox, that app already keeps it online. ';
+  const body =
+    '<p style="margin-top:2px;color:#8a8577;font-size:12.5px">' + intro +
+    '⬇ saves a copy to Downloads · 📎 stores a copy inside the notebook, on this page.</p>' + cloudRow +
+    '<div id="fdList" style="max-height:46vh;overflow:auto;border:1px solid #e3ded0;border-radius:9px;margin-top:8px">' +
+    (rows.length ? rows.map((r, i) =>
+      '<div class="fd-row" style="display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid #f0ece0">' +
+      '<span style="font-size:15px">' + (r.dir ? '📁' : fileEmoji(r.name)) + '</span>' +
+      '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">' + esc(r.name) + '</span>' +
+      (r.dir ? '<span style="color:#8a8577;font-size:11.5px">folder</span>'
+             : '<span style="color:#8a8577;font-size:11.5px">' + fmtBytes(r.size) + '</span>' +
+               '<button class="fd-dl" data-i="' + i + '" title="Save a copy to Downloads" style="' + rowBtn + '">⬇</button>' +
+               '<button class="fd-add" data-i="' + i + '" title="Store a copy inside the notebook, on this page" style="' + rowBtn + '">📎</button>') +
+      '</div>').join('') : '<div style="padding:14px;color:#8a8577">This folder is empty.</div>') +
+    (over ? '<div style="padding:8px 12px;color:#8a8577;font-size:12px">… showing the first 300 items</div>' : '') + '</div>';
+  showModal({ title: '📁 ' + (h.name || 'Linked folder'), body,
+    buttons: [{ label: 'Unlink', onclick: unlinkLabelDir }, { label: 'Change…', onclick: pickLabelDir }, { label: 'Done', cls: 'primary' }] });
+  const list = document.getElementById('fdList');
+  if(list) list.addEventListener('click', async e => {
+    const btn = e.target.closest('.fd-dl, .fd-add');
+    if(!btn) return;
+    const r = rows[+btn.dataset.i];
+    if(!r || !r.handle) return;
+    let f = null;
+    try{ f = await r.handle.getFile(); }catch(_){ toast('Couldn’t read ' + r.name); return; }
+    if(btn.classList.contains('fd-dl')){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(f); a.download = r.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 6000);
+      toast('Saved a copy of ' + r.name + ' to your Downloads');
+    }else{
+      const rng = document.createRange(); rng.selectNodeContents(page); rng.collapse(false);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(rng);
+      if(isPdfFile(f)) await importPdf(f);
+      else if(/^image\//.test(f.type)) await insertImageFile(f);
+      else await attachFile(f);
+    }
+  });
+}
+dirBtn.addEventListener('click', () => { openLabelDirPanel(); });
+
 /* ---------------- PDF import — pages rendered sharp via embedded pdf.js ---------------- */
 const isPdfFile = f => f && (f.type === 'application/pdf' || /\.pdf$/i.test(f.name || ''));
 let pdfjsReady = null;
@@ -3226,8 +3761,8 @@ page.addEventListener('paste', e => {
   if(!cd) return;
   const syncPdf = clipboardPdf(cd);
   const files = [];
-  if(cd.items) for(const it of cd.items){ if(it.kind === 'file' && /^image\//.test(it.type)){ const f = it.getAsFile(); if(f) files.push(f); } }
-  if(!files.length && cd.files) for(const f of cd.files){ if(/^image\//.test(f.type)) files.push(f); }
+  if(cd.items) for(const it of cd.items){ if(it.kind === 'file'){ const f = it.getAsFile(); if(f) files.push(f); } }
+  if(!files.length && cd.files) for(const f of cd.files) files.push(f);
   const text = cd.getData('text/plain');
   if(syncPdf || (files.length && !text)){
     e.preventDefault();
@@ -3267,13 +3802,20 @@ async function readAsyncClipboard(){
   }catch(e){}
   return out;
 }
-async function handlePasteMedia(syncPdf, imgFiles){
+async function handlePasteMedia(syncPdf, pastedFiles){
   const asy = await readAsyncClipboard();
   const pdf = syncPdf || asy.pdf;
   if(pdf){ page.focus({ preventScroll: true }); restoreRange(); await importPdf(pdf); return; }
-  const blobs = imgFiles.concat(asy.imgs);
+  const others = pastedFiles.filter(f => !/^image\//.test(f.type) && !isPdfFile(f));
+  const pdfs = pastedFiles.filter(isPdfFile);
+  if(others.length || pdfs.length){
+    page.focus({ preventScroll: true }); restoreRange();
+    for(const f of pdfs) await importPdf(f);
+    for(const f of others) await attachFile(f);   /* copied files from Finder / Explorer become chips */
+  }
+  const blobs = pastedFiles.filter(f => /^image\//.test(f.type)).concat(asy.imgs);
   if(blobs.length) await insertBestClipboardImage(blobs);
-  else toast('Nothing to paste here');
+  else if(!others.length && !pdfs.length) toast('Nothing to paste here');
 }
 async function insertBestClipboardImage(blobs){
   const cands = [];
@@ -3304,7 +3846,7 @@ page.addEventListener('dragover', e => {
   if(e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault();
 });
 page.addEventListener('drop', e => {
-  const fs = e.dataTransfer ? [...e.dataTransfer.files].filter(f => /^image\//.test(f.type) || isPdfFile(f)) : [];
+  const fs = e.dataTransfer ? [...e.dataTransfer.files] : [];   /* ANY file — images and PDFs render, the rest attach as chips */
   if(!fs.length) return;
   e.preventDefault();
   if(document.caretRangeFromPoint){
@@ -3315,7 +3857,8 @@ page.addEventListener('drop', e => {
   (async () => {
     for(const f of fs){
       if(isPdfFile(f)) await importPdf(f);
-      else await insertImageFile(f);
+      else if(/^image\//.test(f.type)) await insertImageFile(f);
+      else await attachFile(f);
     }
   })();
 });
@@ -3353,7 +3896,11 @@ imgHandle.addEventListener('mousedown', e => {
 });
 addEventListener('mousemove', e => {
   if(!ir || !selectedImg) return;
-  const w = Math.max(50, ir.w0 + e.clientX - ir.startX);
+  /* clamp to the page's writable width — a wider value only LOOKS capped on screen
+     (max-width) but would carry the oversize into Word / print exports */
+  const cs = getComputedStyle(page);
+  const lim = Math.max(60, page.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight));
+  const w = Math.min(lim, Math.max(50, ir.w0 + e.clientX - ir.startX));
   selectedImg.style.width = w + 'px';
   selectedImg.style.height = 'auto';
   placeHandle();
@@ -3536,11 +4083,31 @@ addEventListener('mousedown', e => { if(!cmtPop.hidden && !cmtPop.contains(e.tar
    ============================================================ */
 function safeName(s){ return (s || 'IdeaSink').replace(/[\\/:*?"<>|\n]+/g, '_').trim().slice(0, 60) || 'IdeaSink'; }
 function esc(s){ const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-function cleanForExport(html){
+function cleanForExport(html, maxW){
   const d = document.createElement('div'); d.innerHTML = html || '';
   d.querySelectorAll('.pg-space').forEach(x => x.remove());
   d.querySelectorAll('.cmark').forEach(x => x.remove());
   d.querySelectorAll('.cmt').forEach(sp => sp.replaceWith(...sp.childNodes));
+  /* attached files can't ride along inside a Word/PDF export — keep a small name marker
+     instead of megabytes of base64 that Word would choke on */
+  d.querySelectorAll('a.fchip').forEach(ch => {
+    const sp = document.createElement('span');
+    sp.textContent = '[📎 ' + (ch.dataset.fname || 'attached file') +
+      (ch.dataset.fsize ? ' · ' + fmtBytes(+ch.dataset.fsize) : '') + ']';
+    sp.style.cssText = 'display:inline-block;border:1px solid #bbb;border-radius:6px;padding:1px 7px;background:#f4f2ea;font-size:12px;color:#555';
+    ch.replaceWith(sp);
+  });
+  /* cap images & tables at the export page's content width — Word ignores CSS max-width,
+     and print clips anything wider at the paper edge, cutting the right side off */
+  if(maxW){
+    d.querySelectorAll('img,table').forEach(el => {
+      const w = /px$/.test(el.style.width || '') ? parseFloat(el.style.width) : 0;
+      if(w > maxW){
+        el.style.width = maxW + 'px';
+        if(el.tagName === 'IMG') el.style.height = 'auto';
+      }
+    });
+  }
   return d;
 }
 function dl(blob, name){ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 6000); }
@@ -3573,7 +4140,7 @@ function wantExportNums(note){
   return pageNumOf(note) !== '';
 }
 function wordHtml(note){
-  const inner = cleanForExport(note.content).innerHTML;
+  const inner = cleanForExport(note.content, wantExportNums(note) ? PAPER[note.view].w - 192 : 624).innerHTML;
   if(wantExportNums(note)){
     const P = PAPER[note.view], align = (pageNumOf(note) === 'right') ? 'right' : 'center';
     return '<!doctype html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
@@ -3618,7 +4185,8 @@ function paginateForPrint(doc, paper, pos){
   });
 }
 function exportPDF(note){
-  const html = exportDoc(cleanForExport(note.content).innerHTML, note.name, note.view);
+  const cw = (note.view === 'letter' || note.view === 'a4') ? PAPER[note.view].w - 192 : 752;
+  const html = exportDoc(cleanForExport(note.content, cw).innerHTML, note.name, note.view);
   const pos = pageNumOf(note), nums = pos !== '';
   const pw = (note.view === 'letter' || note.view === 'a4') ? PAPER[note.view].w : 800;
   const ifr = document.createElement('iframe');
@@ -3714,6 +4282,7 @@ function sizeBanner(maxBytes){
     ? 'One label is ' + fmtMB(maxBytes) + ' — close to GitHub’s 100 MB per-file limit. That single label may stop syncing; spread its images across a few labels. Everything stays saved on this device.'
     : 'One of your labels is ' + fmtMB(maxBytes) + ' and getting large (mostly images or PDFs). It still syncs — just consider splitting very large labels.';
   el.hidden = false;
+  restackWarn();
 }
 function updateSizeWatch(){ const s = notebookBytes(); syncBytes = s.total; sizeBanner(s.max); }
 $('#sizeWarnX') && $('#sizeWarnX').addEventListener('click', () => { sizeDismissed = true; const el = $('#sizeWarn'); if(el) el.hidden = true; });
@@ -4262,11 +4831,21 @@ async function initSync(){
   await initAutoBackup();
   route();
   initSync();
+  updateProtectBanner();
+  setTimeout(maybeNagProtect, 1400);   /* let the notebook draw first, then nudge */
   /* tiny hook so automated tests can exercise the sync/backup machinery */
   window.__ideasinkTest = {
-    setBackupDir: h => { dirHandle = h; },
-    setAB: o => { Object.assign(AB, o); saveAB(); startABTimer(); },
+    setBackupDir: h => { dirHandle = h; updateProtectBanner(); },
+    setAB: o => { Object.assign(AB, o); saveAB(); startABTimer(); updateProtectBanner(); },
     doAutoBackup,
+    dataProtected, updateProtectBanner, maybeNagProtect, protectNagModal,
+    setNoNag: v => { NONAG = !!v; updateProtectBanner(); },
+    protectState: () => { const el = document.getElementById('protectWarn'); return {
+      shown: !!el && !el.hidden, safe: dataProtected(), hushed: protHushed, nagAt: PROT.nagAt,
+      msg: (el && el.querySelector('.pw-text') ? el.querySelector('.pw-text').textContent : ''),
+      go: (el && el.querySelector('.pw-go') ? el.querySelector('.pw-go').textContent : ''),
+      stacked: !!document.getElementById('sizeWarn') && document.getElementById('sizeWarn').classList.contains('stacked') }; },
+    protectReset: () => { protHushed = false; PROT.nagAt = 0; saveProt(); updateProtectBanner(); },
     SYNC, TOMB, mergeRemote, mergeSecTomb, makePayload, makeIndex, renderPresence, utf8ToB64, b64ToUtf8,
     connectSync, pullMerge, pullPresence, doPush, pushPresence, ghGetFile, ghListDir,
     sizeBanner, updateSizeWatch, notebookBytes, getSyncBytes: () => syncBytes,
@@ -4284,12 +4863,24 @@ async function initSync(){
     plainText, exportDoc, cleanHTML: h => cleanForExport(h).innerHTML,
     applyView, paginateNow: () => paginate(), getView: () => (cur ? (cur.view || '') : null),
     cardCount: () => document.querySelectorAll('#pageDeco .pcard').length,
+    cleanExportHtml: (html, maxW) => cleanForExport(html, maxW).innerHTML,
+    chipCount: () => document.querySelectorAll('#page a.fchip').length,
+    chipInfo: i => { const c = document.querySelectorAll('#page a.fchip')[i || 0]; if(!c) return null;
+      return { name: c.dataset.fname, size: +c.dataset.fsize, type: c.dataset.ftype,
+               hasData: (c.getAttribute('href') || '').startsWith('data:'), download: c.getAttribute('download'),
+               atomic: c.getAttribute('contenteditable') === 'false' }; },
+    attachTestFile: (name, text, type) => attachFile(new File([text], name, { type: type || 'application/octet-stream' })),
+    setLabelDir: (id, h) => { LDIRS[id] = h; if(cur && cur.id === id){ cur.folderName = h && h.name; persist(cur); } dirBtnRefresh(); },
+    openLabelDirPanel, isTexty, fmtBytes, cloudNameFor, removeCloudLink,
+    dirBtnOn: () => dirBtn.classList.contains('on'),
+    cloudState: () => cur ? { url: cur.cloudUrl || null, name: cur.cloudName || null } : null,
     spacerCount: () => document.querySelectorAll('#page .pg-space').length,
     setPageNum, getPageNum: () => pageNumOf(cur),
     numCount: () => document.querySelectorAll('#pageDeco .pcnum').length,
     numAlign: () => { const n = document.querySelector('#pageDeco .pcnum'); return n ? (n.style.textAlign || '') : null; },
     wordHtml, paginateForPrint,
     afState: () => ({ ac: AF.ac, sn: AF.sn, snips: AF.snips.map(s => ({ c: s.c, t: s.t })) }),
+    caretViewTop: () => { const r = caretViewRect(); return r ? Math.round(r.top) : null; },
     afSetEnabled: (ac, sn) => { AF.ac = ac; AF.sn = sn; afSave(); },
     afSetSnips: arr => { AF.snips = arr.map(s => ({ c: String(s.c), t: String(s.t) })); afSave(); },
     afBuildDict, afSuggest, afDictSize: () => acScores.size,
