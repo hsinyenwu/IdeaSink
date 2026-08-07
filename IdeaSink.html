@@ -274,6 +274,22 @@ body.sheet-embed .tabbar{position:static}
 }
 .tb-btn:hover{background:#edeadf}
 .tb-btn.on{background:#e3dfd0;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+.tb-btn.off{opacity:.32}
+/* names for the icons — appear as soon as the pointer comes near a control */
+#tipbox{position:fixed;z-index:300;pointer-events:none;background:rgba(28,25,18,.95);color:#fff;
+  padding:6px 10px;border-radius:7px;font-size:12.5px;line-height:1.35;max-width:280px;
+  box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .12s ease}
+#tipbox.show{opacity:1}
+#tipbox[hidden]{display:none}
+#tipbox b{font-weight:600}
+#tipbox .tip-key{opacity:.7;margin-left:6px;font-size:11.5px}
+/* while the copy-formatting eyedropper is armed */
+.page.eyedropping,.page.eyedropping *{cursor:crosshair !important}
+#eyedropBtn.arming{background:#1a56c4;color:#fff}
+#eyedropHint{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:240;
+  background:rgba(30,27,20,.93);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;
+  box-shadow:0 8px 26px rgba(0,0,0,.25);pointer-events:none;white-space:nowrap}
+#eyedropHint[hidden]{display:none}
 .tb-btn svg{display:block}
 .tb-color{flex-direction:column;gap:2px;padding:0 9px}
 .tb-color .glyphA{font-weight:800;font-size:12.5px;line-height:1}
@@ -474,7 +490,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
         <button id="importBtn">Restore backup…</button>
         <hr>
         <button id="aboutBtn">About &amp; license</button>
-        <div class="ver">IdeaSink v47</div>
+        <div class="ver">IdeaSink v50</div>
       </div>
     </div>
   </header>
@@ -521,6 +537,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
     <button class="tb-btn" id="strikeBtn" title="Strikethrough" style="text-decoration:line-through">S</button>
     <button class="tb-btn tb-color" id="colorBtn" title="Text color"><span class="glyphA">A</span><span class="cbar" id="colorBar"></span></button>
     <button class="tb-btn tb-color" id="hlBtn" title="Highlight color"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 10.5 4 4"/><path d="M4.5 19.5h4l11-11a2.83 2.83 0 0 0-4-4l-11 11v4Z"/></svg><span class="cbar" id="hlBar"></span></button>
+    <button class="tb-btn" id="eyedropBtn" title="Copy formatting — click here, then click any text to copy its size, color &amp; style (bold/italic/underline)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l1.5-1.5a2.12 2.12 0 0 1 3 3L17 9m-3-3-8.5 8.5a2 2 0 0 0-.5.9l-.9 3.2 3.2-.9a2 2 0 0 0 .9-.5L17 9m-3-3 3 3"/></svg></button>
     <div class="tb-sep"></div>
     <button class="tb-btn" id="ulBtn" title="Bulleted list"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 6h11M9.5 12h11M9.5 18h11"/><circle cx="4.6" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4.6" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></button>
     <button class="tb-btn" id="olBtn" title="Numbered list"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.5 6h10M10.5 12h10M10.5 18h10"/><text x="2" y="8.6" font-size="8" font-family="Arial" fill="currentColor" stroke="none">1</text><text x="2" y="14.6" font-size="8" font-family="Arial" fill="currentColor" stroke="none">2</text><text x="2" y="20.6" font-size="8" font-family="Arial" fill="currentColor" stroke="none">3</text></svg></button>
@@ -588,6 +605,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
 <div class="picker" id="tablePicker" hidden><div class="pgrid" id="pgrid"></div><div class="plabel" id="plabel">1 × 1</div></div>
 <div class="overlay" id="overlay" hidden><div class="modal" id="modal"></div></div>
 <div id="imgHandle" hidden></div>
+<div id="eyedropHint" hidden>Click any text to copy its size, color &amp; style · Esc to cancel</div>
 <div id="selBar" hidden><span id="selCount"></span><button id="selMoveBtn">Move to page ▾</button><button id="selClearBtn" title="Clear selection (Esc)">✕</button></div>
 <div id="lightbox" hidden><div class="lb-inner"><img id="lbImg" alt=""></div><div class="lb-hint">Pixel-perfect view — click anywhere or press Esc to close</div></div>
 <input type="file" id="filePick" accept="image/*,.pdf,application/pdf" multiple hidden>
@@ -600,7 +618,7 @@ body.row-resize,body.row-resize *{cursor:row-resize !important;user-select:none 
    Single-file app. Notes are saved in this browser
    (IndexedDB, with localStorage fallback) + JSON backups.
    ============================================================ */
-const APP_VERSION = 'v47';
+const APP_VERSION = 'v50';
 /* ---- workspace name = the HTML file's name (or ?ws=Name). Each differently-named
    copy is its own separate notebook: own name in the tab + header, own local storage,
    own sync settings. "IdeaSink.html" keeps the original/default storage. ---- */
@@ -1904,6 +1922,7 @@ function openNoteInEditor(n, mode){
     if(n.view == null && rv){ n.view = rv; persist(n); }
     viewSel.value = rv; applyView(rv); }
   dirBtnRefresh();
+  undoReset();                    /* each label gets its own undo history */
   scrollTo(0, 0);
   page.focus({ preventScroll: true });
   if(searchHL){ const hl = searchHL; searchHL = null; setTimeout(() => searchHighlightFirst(hl), 40); }
@@ -1985,6 +2004,129 @@ function pruneComments(){
   for(const cid of Object.keys(cur.comments)){ if(!live.has(cid)) delete cur.comments[cid]; }
 }
 page.addEventListener('input', () => { queueSave(); updateEmpty(); schedulePaginate(); });
+
+/* ============================================================
+   Undo / redo — IdeaSink keeps its own history.
+
+   The browser's built-in undo can't be relied on here: this editor rewrites the
+   DOM behind execCommand (font sizes become spans, pagination inserts spacers,
+   the eyedropper wraps runs in a marker), and touching the editing host on every
+   keystroke shatters Chrome's grouping so one ⌘Z would move by a single letter.
+   Snapshots of our own give predictable, Word-like steps: one undo per word or
+   per action, and as many steps back as you like.
+   ============================================================ */
+const UNDO_MAX = 80;                        /* keep at most this many steps */
+const UNDO_BUDGET = 20 * 1048576;           /* …and at most this many chars total (pages can hold images) */
+const UNDO_GROUP_MS = 900;                  /* typing pauses longer than this start a new step */
+let UND = { past: [], future: [], t: 0, kind: '', endGroup: false, busy: false, applying: false };
+function undoReset(){ UND.past = []; UND.future = []; UND.t = 0; UND.kind = ''; UND.endGroup = false; undoUI(); }
+function undoCaret(){
+  try{
+    const s = getSelection();
+    if(!s.rangeCount) return null;
+    const r = s.getRangeAt(0);
+    if(!page.contains(r.endContainer)) return null;
+    const pre = document.createRange();
+    pre.selectNodeContents(page);
+    pre.setEnd(r.endContainer, r.endOffset);
+    return pre.toString().length;
+  }catch(e){ return null; }
+}
+function undoSetCaret(off){
+  if(off == null) return;
+  let left = off;
+  const walk = document.createTreeWalker(page, NodeFilter.SHOW_TEXT);
+  let n, last = null;
+  while((n = walk.nextNode())){
+    const len = n.data.length;
+    if(left <= len){
+      const r = document.createRange();
+      r.setStart(n, Math.max(0, Math.min(len, left))); r.collapse(true);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      return;
+    }
+    left -= len; last = n;
+  }
+  const r = document.createRange();
+  if(last){ r.setStart(last, last.data.length); r.collapse(true); }
+  else { r.selectNodeContents(page); r.collapse(false); }
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+function undoTrim(){
+  let bytes = UND.past.reduce((a, e) => a + e.html.length, 0);
+  while(UND.past.length > 1 && (UND.past.length > UNDO_MAX || bytes > UNDO_BUDGET)){
+    bytes -= UND.past[0].html.length;
+    UND.past.shift();
+  }
+}
+/* record the CURRENT state as a point we can come back to — call before changing anything */
+function undoPush(){
+  if(!cur || UND.applying || UND.busy) return;
+  const s = { html: serialize(), caret: undoCaret() };
+  const top = UND.past[UND.past.length - 1];
+  if(top && top.html === s.html){ top.caret = s.caret; return; }   /* nothing actually changed */
+  UND.past.push(s);
+  UND.future.length = 0;                    /* a fresh edit abandons the redo trail */
+  undoTrim();
+  undoUI();
+}
+function undoApply(s){
+  UND.applying = true;
+  try{
+    page.innerHTML = s.html;
+    updateEmpty();
+    page.focus({ preventScroll: true });
+    undoSetCaret(s.caret);
+  }finally{ UND.applying = false; }
+  queueSave();
+  refreshState();
+  schedulePaginate();
+  undoUI();
+}
+function doUndo(){
+  if(!cur || !UND.past.length){ return false; }
+  UND.future.push({ html: serialize(), caret: undoCaret() });
+  undoApply(UND.past.pop());
+  UND.kind = ''; UND.endGroup = false;
+  return true;
+}
+function doRedo(){
+  if(!cur || !UND.future.length){ return false; }
+  UND.past.push({ html: serialize(), caret: undoCaret() });
+  undoApply(UND.future.pop());
+  UND.kind = ''; UND.endGroup = false;
+  return true;
+}
+function undoUI(){
+  const u = document.getElementById('undoBtn'), r = document.getElementById('redoBtn');
+  if(u) u.classList.toggle('off', !UND.past.length);
+  if(r) r.classList.toggle('off', !UND.future.length);
+}
+/* group plain typing into word-sized steps; every structural edit gets its own */
+page.addEventListener('beforeinput', e => {
+  const t = e.inputType || '';
+  if(t === 'historyUndo'){ e.preventDefault(); doUndo(); return; }
+  if(t === 'historyRedo'){ e.preventDefault(); doRedo(); return; }
+  if(UND.busy || UND.applying) return;
+  const now = Date.now();
+  const typing = /^insert(Text|CompositionText|Replacement)/.test(t);
+  const deleting = /^delete/.test(t);
+  const kind = typing ? 'type' : (deleting ? 'del' : 'struct');
+  let start;
+  if(kind === 'struct') start = true;
+  else start = UND.endGroup || kind !== UND.kind || (now - UND.t > UNDO_GROUP_MS);
+  if(start) undoPush();
+  /* a space or punctuation closes the word, so the NEXT letter opens a fresh step */
+  UND.endGroup = typing && (e.data == null || /[\s.,;:!?)\]}"']/.test(e.data));
+  UND.kind = kind; UND.t = now;
+}, true);
+/* composite operations (eyedropper, auto-fill, media insert) snapshot once, up front */
+function undoGroup(fn){
+  undoPush();
+  UND.busy = true;
+  try{ return fn(); }
+  finally{ UND.busy = false; UND.kind = ''; UND.endGroup = false; UND.t = Date.now(); }
+}
 
 /* ============================================================
    Text auto-fill — word suggestions as you type + custom shortcut expansion.
@@ -2101,6 +2243,10 @@ function afFindSnip(code){
   return hit ? hit.t : null;
 }
 function afInsert(text){
+  undoPush(); UND.busy = true;
+  try{ afInsertInner(text); } finally { UND.busy = false; UND.kind = ''; UND.endGroup = false; UND.t = Date.now(); }
+}
+function afInsertInner(text){
   /* insert line by line so newlines become clean single breaks (no stray blank lines),
      while single-line inserts stay one native undo step */
   const parts = String(text).split(/\r?\n/);
@@ -2623,6 +2769,7 @@ document.querySelectorAll('.toolbar .tb-btn').forEach(b => b.addEventListener('m
 /* ---------------- formatting ---------------- */
 function exec(cmd){
   page.focus({ preventScroll: true });
+  undoPush();
   document.execCommand(cmd);
   refreshState();
 }
@@ -2630,8 +2777,8 @@ boldBtn.addEventListener('click', () => exec('bold'));
 italBtn.addEventListener('click', () => exec('italic'));
 undBtn.addEventListener('click', () => exec('underline'));
 strikeBtn.addEventListener('click', () => exec('strikeThrough'));
-$('#undoBtn').addEventListener('click', () => { page.focus({ preventScroll: true }); stripDecoration(); document.execCommand('undo'); queueSave(); updateEmpty(); refreshState(); schedulePaginate(); });
-$('#redoBtn').addEventListener('click', () => { page.focus({ preventScroll: true }); stripDecoration(); document.execCommand('redo'); queueSave(); updateEmpty(); refreshState(); schedulePaginate(); });
+$('#undoBtn').addEventListener('click', () => { page.focus({ preventScroll: true }); if(!doUndo()) toast('Nothing left to undo'); });
+$('#redoBtn').addEventListener('click', () => { page.focus({ preventScroll: true }); if(!doRedo()) toast('Nothing to redo'); });
 
 function refreshState(){
   if(editorView.hidden) return;
@@ -2705,6 +2852,7 @@ lineSel.addEventListener('change', () => {
   if(!v || !cur) return;
   page.focus({ preventScroll: true });
   restoreRange();
+  undoPush();
   let blocks = lineBlocks();
   if(!blocks.length){                       /* bare first line — wrap it so the spacing sticks */
     try{ document.execCommand('formatBlock', false, 'div'); }catch(e){}
@@ -2718,6 +2866,7 @@ lineSel.addEventListener('change', () => {
 function applyFontSize(px){
   const sel = getSelection();
   if(!sel.rangeCount) return;
+  undoPush();
   if(sel.isCollapsed){
     document.execCommand('insertHTML', false, '<span data-fs="1" style="font-size:' + px + 'px">\u200B</span>');
     const sp = page.querySelector('span[data-fs]');
@@ -2776,6 +2925,7 @@ fontSel.addEventListener('change', () => {
 function applyFontFamily(primary, stack){
   const sel = getSelection();
   if(!sel.rangeCount) return;
+  undoPush();
   if(sel.isCollapsed){
     document.execCommand('insertHTML', false, '<span data-ff="1" style="font-family:' + stack + '">\u200B</span>');
     const sp = page.querySelector('span[data-ff]');
@@ -2826,6 +2976,7 @@ function applyCollapsedStyle(css){
 function applyTextColor(c){
   const sel = getSelection();
   if(!sel.rangeCount) return;
+  undoPush();
   if(sel.isCollapsed){ applyCollapsedStyle('color:' + c); return; }
   try{ document.execCommand('styleWithCSS', false, false); }catch(e){}
   document.execCommand('foreColor', false, c);
@@ -2839,6 +2990,7 @@ function applyTextColor(c){
 function applyHighlight(c){
   const sel = getSelection();
   if(!sel.rangeCount) return;
+  undoPush();
   if(sel.isCollapsed){ if(c !== 'transparent') applyCollapsedStyle('background-color:' + c); return; }
   try{ document.execCommand('styleWithCSS', false, true); }catch(e){}
   try{ document.execCommand('hiliteColor', false, c); }
@@ -2854,11 +3006,26 @@ function applyHighlight(c){
     });
   }
 }
+const screenPickOK = () => typeof window.EyeDropper === 'function';
+/* native screen color-picker — grab any pixel (from a photo, PDF page, anything) */
+function pickFromScreen(apply){
+  if(!screenPickOK()){ toast('Picking a color from the screen needs Chrome or Edge'); return; }
+  try{
+    new EyeDropper().open().then(res => {
+      if(res && res.sRGBHex){
+        page.focus({ preventScroll: true });
+        restoreRange();
+        apply(res.sRGBHex);
+        queueSave();
+      }
+    }).catch(() => {});   /* user pressed Esc */
+  }catch(e){ toast('Couldn’t open the screen color picker'); }
+}
 colorBtn.addEventListener('click', () => {
   if(!cur) return;
   saveRange();
   const r = colorBtn.getBoundingClientRect();
-  openMenu(r.left, r.bottom + 4, [
+  const items = [
     { palette: true, colors: TEXT_COLORS, cur: lastTextColor, pick: c => {
       lastTextColor = c; colorBar.style.background = c;
       page.focus({ preventScroll: true });
@@ -2866,13 +3033,17 @@ colorBtn.addEventListener('click', () => {
       applyTextColor(c);
       queueSave();
     }}
-  ]);
+  ];
+  if(screenPickOK()) items.push({ label: '🎯 Pick from screen…', onclick: () => pickFromScreen(c => {
+    lastTextColor = c; colorBar.style.background = c; applyTextColor(c);
+  }) });
+  openMenu(r.left, r.bottom + 4, items);
 });
 hlBtn.addEventListener('click', () => {
   if(!cur) return;
   saveRange();
   const r = hlBtn.getBoundingClientRect();
-  openMenu(r.left, r.bottom + 4, [
+  const items = [
     { label: 'No highlight', onclick: () => {
       page.focus({ preventScroll: true });
       restoreRange();
@@ -2886,10 +3057,159 @@ hlBtn.addEventListener('click', () => {
       applyHighlight(c);
       queueSave();
     }}
-  ]);
+  ];
+  if(screenPickOK()) items.push({ label: '🎯 Pick from screen…', onclick: () => pickFromScreen(c => {
+    lastHl = c; hlBar.style.background = c; applyHighlight(c);
+  }) });
+  openMenu(r.left, r.bottom + 4, items);
 });
 ulBtn.addEventListener('click', () => exec('insertUnorderedList'));
 olBtn.addEventListener('click', () => exec('insertOrderedList'));
+
+/* ---------------- eyedropper: copy size + color from existing text ---------------- */
+const eyedropBtn = $('#eyedropBtn'), eyedropHint = $('#eyedropHint');
+let eyedropping = false;
+/* apply size/color to the current selection, or — if nothing is selected — leave the caret
+   inside a styled span so the very next thing typed picks them up (mirrors how the size/color
+   controls already behave on a collapsed caret) */
+/* set a toggle command (bold/italic/underline/strikeThrough) to an exact on/off state,
+   for a selection or a collapsed caret (where it sets the pending state for the next typing) */
+function setToggle(cmd, want){
+  let is = false; try{ is = document.queryCommandState(cmd); }catch(e){}
+  if(is !== !!want){ try{ document.execCommand(cmd); }catch(e){} }
+}
+function applyPickedFormat(fmt){
+  const sel = getSelection();
+  if(!sel.rangeCount) return;
+  undoPush(); UND.busy = true;
+  try{ applyPickedFormatInner(fmt, sel); } finally { UND.busy = false; UND.kind = ''; UND.endGroup = false; UND.t = Date.now(); }
+}
+function applyPickedFormatInner(fmt, sel){
+  if(sel.isCollapsed){
+    /* nothing selected — leave the caret in a span carrying the look, so the next thing
+       typed comes out matching. B/I/U/S ride the browser's pending-format state. */
+    const css = (fmt.px ? 'font-size:' + fmt.px + 'px;' : '') +
+                (fmt.color ? 'color:' + fmt.color + ';' : '') +
+                (fmt.fontStack ? 'font-family:' + fmt.fontStack : '');
+    if(css) applyCollapsedStyle(css);
+    setToggle('bold', fmt.bold); setToggle('italic', fmt.italic);
+    setToggle('underline', fmt.underline); setToggle('strikeThrough', fmt.strike);
+    queueSave(); refreshState();
+    return;
+  }
+  /* something is selected — apply the whole look to it. applyFontSize/applyTextColor/etc.
+     each rebuild the DOM and collapse the live selection, so wrap the run in a marker and
+     re-target it before each step rather than trusting the selection to survive. */
+  const range = sel.getRangeAt(0);
+  const mark = document.createElement('span'); mark.setAttribute('data-eyemark', '1');
+  let wrapped = true;
+  try{ range.surroundContents(mark); }
+  catch(e){ try{ mark.appendChild(range.extractContents()); range.insertNode(mark); }catch(_){ wrapped = false; } }
+  const reselect = () => { const r = document.createRange(); r.selectNodeContents(mark); sel.removeAllRanges(); sel.addRange(r); };
+  const applyAll = () => {
+    if(fmt.px){ if(wrapped) reselect(); applyFontSize(fmt.px); }
+    if(fmt.color){ if(wrapped) reselect(); applyTextColor(fmt.color); }
+    if(fmt.fontStack){ if(wrapped) reselect(); applyFontFamily(fmt.fontName, fmt.fontStack); }
+    if(wrapped) reselect();
+    setToggle('bold', fmt.bold); setToggle('italic', fmt.italic);
+    setToggle('underline', fmt.underline); setToggle('strikeThrough', fmt.strike);
+  };
+  applyAll();
+  if(wrapped){
+    const parent = mark.parentNode;                 /* dissolve the marker, keep the styled spans + selection */
+    if(parent){
+      const moved = [...mark.childNodes];
+      moved.forEach(node => parent.insertBefore(node, mark));
+      parent.removeChild(mark);
+      if(moved.length){
+        const r = document.createRange();
+        r.setStartBefore(moved[0]); r.setEndAfter(moved[moved.length - 1]);
+        sel.removeAllRanges(); sel.addRange(r);
+      }
+    }
+  }
+  queueSave();
+  refreshState();
+}
+function endEyedrop(){
+  eyedropping = false;
+  page.classList.remove('eyedropping');
+  eyedropBtn.classList.remove('arming');
+  eyedropHint.hidden = true;
+}
+function startEyedrop(){
+  if(!cur) return;
+  if(eyedropping){ endEyedrop(); return; }
+  saveRange();
+  eyedropping = true;
+  page.classList.add('eyedropping');
+  eyedropBtn.classList.add('arming');
+  eyedropHint.hidden = false;
+}
+/* text-decoration isn't inherited onto a child's computed style — a <u> wrapper or a
+   decorated ancestor won't show on the clicked node — so walk up to catch it */
+function decoratedWith(node, kind){   /* kind: 'underline' | 'line-through' */
+  const tags = kind === 'underline' ? ['U'] : ['S', 'STRIKE', 'DEL'];
+  let el = node.nodeType === 3 ? node.parentElement : node;
+  while(el){
+    if(el.nodeType === 1){
+      if(tags.includes(el.tagName)) return true;
+      const d = getComputedStyle(el).textDecorationLine || getComputedStyle(el).textDecoration || '';
+      if(d.split(/\s+/).includes(kind)) return true;
+    }
+    if(el === page) break;
+    el = el.parentElement;
+  }
+  return false;
+}
+function readFormat(n){
+  const cs = getComputedStyle(n);
+  const w = String(cs.fontWeight);
+  const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim().toLowerCase();
+  const font = (typeof FONTS !== 'undefined') ? FONTS.find(f => f[0].toLowerCase() === fam) : null;
+  return {
+    px: Math.round(parseFloat(cs.fontSize)) || 0,
+    color: cs.color,
+    fontName: font ? font[0] : '',
+    fontStack: font ? font[1] : '',
+    bold: (w === 'bold' || w === 'bolder' || (parseInt(w, 10) >= 600)),
+    italic: (cs.fontStyle === 'italic' || cs.fontStyle === 'oblique'),
+    underline: decoratedWith(n, 'underline'),
+    strike: decoratedWith(n, 'line-through')
+  };
+}
+function fmtSummary(f){
+  const bits = [];
+  if(f.px) bits.push('size ' + f.px);
+  bits.push('color');
+  const st = [];
+  if(f.bold) st.push('bold'); if(f.italic) st.push('italic');
+  if(f.underline) st.push('underline'); if(f.strike) st.push('strikethrough');
+  if(st.length) bits.push(st.join('+'));
+  else bits.push('style');
+  return bits.join(' + ');
+}
+function eyedropSampleFrom(target){
+  let n = target;
+  if(n && n.nodeType === 3) n = n.parentElement;
+  if(!n || !page.contains(n) || n === page){ endEyedrop(); toast('Click on some text to copy from'); return; }
+  const fmt = readFormat(n);
+  endEyedrop();
+  page.focus({ preventScroll: true });
+  restoreRange();
+  const s = getSelection();
+  const hadSel = s.rangeCount && !s.isCollapsed && page.contains(s.anchorNode);
+  applyPickedFormat(fmt);
+  lastTextColor = fmt.color; colorBar.style.background = fmt.color;
+  toast((hadSel ? 'Copied ' : 'Picked up ') + fmtSummary(fmt) + (hadSel ? ' to your selection' : ' — applies as you type'));
+}
+eyedropBtn.addEventListener('click', startEyedrop);
+/* capture-phase so we sample the click before it moves the caret / clears things */
+page.addEventListener('mousedown', e => {
+  if(!eyedropping) return;
+  e.preventDefault(); e.stopPropagation();
+  eyedropSampleFrom(e.target);
+}, true);
 
 /* ---------------- hyperlinks ---------------- */
 function anchorAtSelection(){
@@ -2958,14 +3278,14 @@ page.addEventListener('contextmenu', e => {
       items.push({ label: 'View as text', onclick: () => viewChipText(chip) });
     items.push(
       { label: 'File info', onclick: () => fileInfoDialog(chip) },
-      { label: 'Remove file', cls: 'mi-danger', onclick: () => { chip.remove(); queueSave(); updateEmpty(); } }
+      { label: 'Remove file', cls: 'mi-danger', onclick: () => { undoPush(); chip.remove(); queueSave(); updateEmpty(); } }
     );
   }
   if(a){
     items.push(
       { label: 'Open link', onclick: () => window.open(a.href, '_blank') },
       { label: 'Edit link…', onclick: () => linkDialog(a) },
-      { label: 'Remove link', onclick: () => { a.replaceWith(...a.childNodes); queueSave(); } }
+      { label: 'Remove link', onclick: () => { undoPush(); a.replaceWith(...a.childNodes); queueSave(); } }
     );
   }else if(hasSel){
     items.push({ label: 'Add hyperlink…', onclick: () => linkDialog(null) });
@@ -2980,7 +3300,7 @@ page.addEventListener('contextmenu', e => {
       { label: 'Image info', onclick: () => imageInfoDialog(img) },
       { label: 'Image → full width', onclick: () => { img.style.width = '100%'; img.style.height = 'auto'; queueSave(); } },
       { label: 'Image → half width', onclick: () => { img.style.width = '50%'; img.style.height = 'auto'; queueSave(); } },
-      { label: 'Remove image', cls: 'mi-danger', onclick: () => { img.remove(); deselectImg(); queueSave(); updateEmpty(); } }
+      { label: 'Remove image', cls: 'mi-danger', onclick: () => { undoPush(); img.remove(); deselectImg(); queueSave(); updateEmpty(); } }
     );
   }
   if(cell){
@@ -2993,7 +3313,7 @@ page.addEventListener('contextmenu', e => {
       'sep',
       { label: 'Delete row', cls: 'mi-danger', onclick: () => tblDelRow(cell) },
       { label: 'Delete column', cls: 'mi-danger', onclick: () => tblDelCol(cell) },
-      { label: 'Delete table', cls: 'mi-danger', onclick: () => { cell.closest('table').remove(); queueSave(); updateEmpty(); } }
+      { label: 'Delete table', cls: 'mi-danger', onclick: () => { undoPush(); cell.closest('table').remove(); queueSave(); updateEmpty(); } }
     );
   }
   openMenu(e.clientX, e.clientY, items);
@@ -3033,6 +3353,7 @@ tblBtn.addEventListener('click', () => {
 });
 function hidePicker(){ picker.hidden = true; }
 function insertTable(cols, rows){
+  undoPush();
   if(!cur) return;
   page.focus({ preventScroll: true });
   restoreRange();
@@ -3074,6 +3395,7 @@ function insertTable(cols, rows){
   queueSave(); updateEmpty();
 }
 function tblAddRow(cell, below){
+  undoPush();
   const tr = cell.parentElement;
   const n = tr.cloneNode(true);
   n.style.height = '';
@@ -3082,6 +3404,7 @@ function tblAddRow(cell, below){
   queueSave();
 }
 function tblAddCol(cell, right){
+  undoPush();
   const table = cell.closest('table');
   const ci = cell.cellIndex, w = 64;
   for(const row of table.rows){
@@ -3094,12 +3417,14 @@ function tblAddCol(cell, right){
   queueSave();
 }
 function tblDelRow(cell){
+  undoPush();
   const table = cell.closest('table');
   if(table.rows.length <= 1) table.remove();
   else cell.parentElement.remove();
   queueSave(); updateEmpty();
 }
 function tblDelCol(cell){
+  undoPush();
   const table = cell.closest('table');
   const ci = cell.cellIndex;
   if(table.rows[0].cells.length <= 1){ table.remove(); }
@@ -3281,6 +3606,7 @@ page.addEventListener('dblclick', e => {
   if(img && page.contains(img)) openLightbox(img.src);
 });
 async function insertImageAtCaret(url, addBreak){
+  undoPush();
   /* place at a size that maps 1 image pixel → 1 screen pixel on Retina displays
      (that keeps things sharp), but never start smaller than ~40% of the column */
   const dims = await new Promise(res => {
@@ -3355,6 +3681,7 @@ async function attachFile(f){
     fr.readAsDataURL(f);
   });
   if(!url){ toast('Couldn’t read “' + f.name + '”'); return; }
+  undoPush();
   page.focus({ preventScroll: true });
   document.execCommand('insertHTML', false, fchipHtml(f.name, f.size, f.type, url) + '&nbsp;');
   toast(f.size > ATTACH_WARN
@@ -3774,6 +4101,7 @@ page.addEventListener('paste', e => {
   if(html || text){
     e.preventDefault();
     page.focus({ preventScroll: true });
+    undoPush();                       /* one undo step for the whole paste */
     const cleaned = html ? cleanPastedHtml(html) : null;
     if(cleaned && cleaned.trim()) document.execCommand('insertHTML', false, cleaned);
     else document.execCommand('insertText', false, text || '');
@@ -3907,6 +4235,89 @@ addEventListener('mousemove', e => {
 });
 addEventListener('mouseup', () => { if(ir){ ir = null; queueSave(); } });
 
+/* ---------------- tooltips: name every icon, without the browser's long wait ----------------
+   Native title tooltips take about a second to appear and can't be styled. These show as
+   soon as the pointer comes near a control (a few pixels of slack, so you don't have to
+   land on it exactly) and read the wording straight from each control's title. */
+const tipbox = document.createElement('div');
+tipbox.id = 'tipbox'; tipbox.hidden = true;
+document.body.appendChild(tipbox);
+const TIP_BARS = '.toolbar, .deskmenu, .tabtools, .sheettools';
+const TIP_NEAR = 10;          /* how close counts as "near" */
+const TIP_DELAY = 90;
+let tipEl = null, tipT = 0, tipRaf = 0;
+function tipTextFor(el){
+  if(el.hasAttribute('title')){          /* adopt it (some titles are set at runtime) */
+    const t = el.getAttribute('title');
+    if(t) el.setAttribute('data-tip', t);
+    el.removeAttribute('title');
+  }
+  return el.getAttribute('data-tip') || '';
+}
+function hideTip(){
+  clearTimeout(tipT); tipEl = null;
+  tipbox.classList.remove('show');
+  tipbox.hidden = true;
+}
+function placeTip(el){
+  const txt = tipTextFor(el);
+  if(!txt){ hideTip(); return; }
+  /* "Name (⌘Z)" or "Name — detail" → bold name, quiet remainder.
+     The dash must be surrounded by spaces so hyphenated words stay intact. */
+  let name = txt.trim(), rest = '';
+  let m = /^(.+?)\s+[—–-]\s+(.+)$/.exec(name);
+  if(m){ name = m[1]; rest = m[2]; }
+  else if((m = /^(.+?)\s*\((.+)\)$/.exec(name))){ name = m[1]; rest = m[2]; }
+  tipbox.innerHTML = '<b>' + esc(name) + '</b>' + (rest ? '<span class="tip-key">' + esc(rest) + '</span>' : '');
+  tipbox.hidden = false;
+  const r = el.getBoundingClientRect(), t = tipbox.getBoundingClientRect();
+  let left = r.left + r.width / 2 - t.width / 2;
+  left = Math.max(8, Math.min(left, innerWidth - t.width - 8));
+  let top = r.bottom + 7;
+  if(top + t.height > innerHeight - 8) top = r.top - t.height - 7;
+  tipbox.style.left = Math.round(left) + 'px';
+  tipbox.style.top = Math.round(top) + 'px';
+  requestAnimationFrame(() => tipbox.classList.add('show'));
+}
+function tipCandidate(x, y){
+  for(const bar of document.querySelectorAll(TIP_BARS)){
+    if(!bar.offsetParent && bar.offsetHeight === 0) continue;
+    const br = bar.getBoundingClientRect();
+    if(x < br.left - TIP_NEAR || x > br.right + TIP_NEAR || y < br.top - TIP_NEAR || y > br.bottom + TIP_NEAR) continue;
+    let best = null, bestD = Infinity;
+    for(const el of bar.querySelectorAll('button, select, input, .stgbtn')){
+      if(el.hidden || !el.offsetWidth) continue;
+      if(el.closest('#menuDrop')) continue;                       /* dropdown rows read as words already */
+      if(!el.hasAttribute('title') && !el.hasAttribute('data-tip')) continue;
+      const r = el.getBoundingClientRect();
+      const dx = Math.max(r.left - x, 0, x - r.right);
+      const dy = Math.max(r.top - y, 0, y - r.bottom);
+      const d = Math.hypot(dx, dy);
+      if(d <= TIP_NEAR && d < bestD){ best = el; bestD = d; }
+    }
+    if(best) return best;
+  }
+  return null;
+}
+addEventListener('mousemove', e => {
+  if(tipRaf) return;
+  const x = e.clientX, y = e.clientY;
+  tipRaf = requestAnimationFrame(() => {
+    tipRaf = 0;
+    const el = tipCandidate(x, y);
+    if(el === tipEl) return;
+    clearTimeout(tipT);
+    tipEl = el;
+    if(!el){ tipbox.classList.remove('show'); tipbox.hidden = true; return; }
+    /* already showing one? swap straight over, otherwise wait a beat */
+    if(!tipbox.hidden) placeTip(el);
+    else tipT = setTimeout(() => { if(tipEl === el) placeTip(el); }, TIP_DELAY);
+  });
+}, { passive: true });
+addEventListener('mousedown', hideTip, true);
+addEventListener('scroll', hideTip, true);
+addEventListener('blur', hideTip);
+
 /* ---------------- global dismissal + shortcuts ---------------- */
 addEventListener('mousedown', e => {
   if(!ctxMenu.hidden && !ctxMenu.contains(e.target)) closeMenu();
@@ -3915,7 +4326,18 @@ addEventListener('mousedown', e => {
   if(dm && !dm.contains(e.target)) $('#menuDrop').hidden = true;
 });
 addEventListener('keydown', e => {
-  if(e.key === 'Escape'){ closeMenu(); hidePicker(); if(!overlay.hidden) hideModal(); if(!lightbox.hidden) closeLightbox(); if(!searchOverlay.hidden) searchClose(); deselectImg(); clearSel(); }
+  if(e.key === 'Escape'){ if(eyedropping){ endEyedrop(); toast('Eyedropper cancelled'); return; } closeMenu(); hidePicker(); if(!overlay.hidden) hideModal(); if(!lightbox.hidden) closeLightbox(); if(!searchOverlay.hidden) searchClose(); deselectImg(); clearSel(); }
+  /* ⌘Z / ⌘⇧Z (and Ctrl-Y) drive OUR history, not the browser's — only while editing a page */
+  if((e.metaKey || e.ctrlKey) && !e.altKey && (e.key.toLowerCase() === 'z' || e.key.toLowerCase() === 'y')){
+    const inPage = !editorView.hidden && (document.activeElement === page || page.contains(document.activeElement) ||
+      (getSelection().rangeCount && page.contains(getSelection().anchorNode)));
+    if(inPage){
+      e.preventDefault();
+      const redo = e.shiftKey || e.key.toLowerCase() === 'y';
+      if(redo) doRedo(); else doUndo();
+      return;
+    }
+  }
   /* ⌘F / Ctrl-F searches the whole notebook (better than the browser's find, which only sees the open page) */
   if((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'f'){ e.preventDefault(); searchOpen(); }
   if((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 's'){
@@ -3988,6 +4410,7 @@ function applyCommentStates(){
 }
 $('#cmtBtn').addEventListener('click', () => addCommentToSelection());
 function addCommentToSelection(){
+  undoPush();
   if(!cur){ return; }
   const s = getSelection();
   if(!s.rangeCount || s.isCollapsed || !page.contains(s.anchorNode)){ toast('Select the text you want to comment on'); return; }
@@ -4881,6 +5304,13 @@ async function initSync(){
     wordHtml, paginateForPrint,
     afState: () => ({ ac: AF.ac, sn: AF.sn, snips: AF.snips.map(s => ({ c: s.c, t: s.t })) }),
     caretViewTop: () => { const r = caretViewRect(); return r ? Math.round(r.top) : null; },
+    eyedropArm: () => startEyedrop(),
+    eyedropActive: () => eyedropping,
+    eyedropSample: el => eyedropSampleFrom(el),
+    eyedropRead: el => readFormat(el),
+    screenPickSupported: () => screenPickOK(),
+    colorBarBg: () => colorBar.style.background,
+    hlBarBg: () => hlBar.style.background,
     afSetEnabled: (ac, sn) => { AF.ac = ac; AF.sn = sn; afSave(); },
     afSetSnips: arr => { AF.snips = arr.map(s => ({ c: String(s.c), t: String(s.t) })); afSave(); },
     afBuildDict, afSuggest, afDictSize: () => acScores.size,

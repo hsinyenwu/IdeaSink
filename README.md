@@ -19,7 +19,7 @@ optionally sync between two people through GitHub.
 4. Use the toolbar to format; everything saves automatically.
 5. **Set a backup folder** the first time you are asked — **Menu → “Automatic backup…” → “Choose backup folder…”**. Until you do, your notes exist only inside the browser and clearing browsing data would delete them. See “Saving & backups” below.
 
-The little version tag lives at the bottom of the **Menu** (currently **v47**).
+The little version tag lives at the bottom of the **Menu** (currently **v50**).
 
 ## Multiple notebooks (name follows the file)
 
@@ -78,9 +78,12 @@ A couple of notes: the name comes from the file name, so **keep a notebook’s f
 - **Print** (the printer button in the toolbar, or **⌘/Ctrl‑P**): opens your computer’s print dialog, which lists all of your installed printers (and “Save as PDF”) — just pick one. What prints matches the page view you chose: “Pages” sheets print as real Letter/A4 pages with your page numbers. You can also print a label’s page straight from the sheet by right‑clicking it → **Save or print → Print / PDF…**.
 - **Bold, Italic, Underline, Strikethrough.**
 - **Text color** (24) and **Highlight** (8 colors + “no highlight”).
+- **Eyedropper — copy formatting** (the 🎯 button in the toolbar): click it, then click any text on the page, and IdeaSink copies **that text’s whole look — size, color, font, *and* style (bold, italic, underline, strikethrough)**. If you had text selected, it’s applied to your selection right away; if not, the formatting loads in so the next thing you type matches. Great for making one bit of text look exactly like another without redoing each button. Press **Esc** to cancel.
+- **Pick a color from the screen** (in the text‑color and highlight menus, “🎯 Pick from screen…”): grabs the exact color of *any pixel on your screen* — a photo, an imported PDF page, anything — and uses it as your text or highlight color. Chrome/Edge only (it uses the browser’s built‑in screen color picker).
 - **Bulleted and numbered lists** — Tab / Shift‑Tab to indent, Enter on an empty bullet to leave the list.
 - **Hyperlinks:** select text → right‑click → Add hyperlink (⌘/Ctrl‑click a link to open it).
-- **Undo / Redo:** the ↶ ↷ buttons, or ⌘Z / ⌘⇧Z.
+- **Undo / Redo:** the ↶ ↷ buttons, or ⌘Z / ⌘⇧Z — **as many steps back as you like**. IdeaSink keeps its own history rather than relying on the browser's, so the steps are the size you'd expect: roughly **one word (or one action) per press**, not one letter. Each formatting change, paste, image, or table edit is its own step, and **Redo** walks the whole way forward again. The buttons dim when there's nothing left to undo or redo. Each label keeps its own history for the session.
+- **Icon names on hover:** move the pointer near any toolbar icon and a small label appears right away — the tool's name plus its shortcut (e.g. **Bold ⌘B**). No need to land on the button exactly, and no waiting for the browser's slow tooltip.
 - **Paste matches your page:** pasted text takes on the page’s font instead of the copied font (bold, italic, lists, and links are kept).
 - **Text auto-fill** (Menu → **“Text auto-fill…”**): two optional writing helpers.
   - **Word suggestions as you type** — ***off* unless you turn it on** (the pop‑up list annoyed more than it helped, so it’s opt‑in as of v47). When enabled: after a couple of letters, a small list appears with likely words — drawn from what you’ve already written plus common English words. **Tab**/**Enter** accepts, ↑/↓ picks, typing on ignores.
@@ -251,4 +254,4 @@ the file as shipped; the licence text is at
 <http://www.apache.org/licenses/LICENSE-2.0>. Nothing else third-party is
 included — no fonts, no CDNs, no analytics.
 
-*IdeaSink v47*
+*IdeaSink v50*
